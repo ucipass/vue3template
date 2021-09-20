@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: main.py",
+      "type": "python",
+      "request": "launch",
+      "program": "main.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/backend-python"
+    },
+    {
+      "name": "Python: test.py",
+      "type": "python",
+      "request": "launch",
+      "program": "test.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/backend-python"
+    },
+    {
+      "type": "pwa-chrome",
+      "request": "launch",
+      "name": "Launch Chrome against localhost",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}"
+    }
+  ]
+}

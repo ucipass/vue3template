@@ -1,2 +1,1 @@
-# vue3template
-vue3template
+# Amazon Login ony at this time
