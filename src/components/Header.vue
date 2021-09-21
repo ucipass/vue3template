@@ -7,6 +7,14 @@
   </div>        
   <div>
       <button 
+        v-if = "$store.state.idToken"
+        type="button" 
+        class="btn btn-outline-light me-1"
+        @click="logout()"
+      >Logout
+      </button>
+      <button 
+        v-else
         type="button" 
         class="btn btn-outline-light me-1"
         data-bs-toggle="modal" 
@@ -54,9 +62,16 @@ export default {
   computed: {
       count (){
           return this.$store.state.count
-      },
+      }
+      // ,
+      // logged_in () {
+      //   return ( this.$store.statecredentials)
+      // }
   },  
   methods:{
+    logout: function(){
+      window.location.reload()
+    },
     login: async function () {
       let input  = this.$store.state[this.name].values
       let store = this.$store
