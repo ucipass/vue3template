@@ -4,24 +4,37 @@ const store = createStore({
     state () {
       return {
         url: "http://localhost;8000",
-        username: "guest",
-        password: "guest",
+        username: "admin",
+        password: "",
         status: "not logged in",
         socket: null,
-        region: "us-east-2",
-        userPoolId: "us-east-2_j3Vcx1Ss3",
-        clientId: "7d725jjrn1ve7gpce38bo06rvp",
-        identityPoolId: "us-east-2:79ae3f9e-4e21-4a17-a624-d7818293439e",
+        region: "",  //"us-east-2"
+        bucket: "",  //"accountid_name"
+        userPoolId: "", //us-east-2_j3Vcx1Ss3
+        clientId: "", //7d725jjrn1ve7gpce38bo06rvp
+        identityPoolId: "",  //us-east-2:79ae3f9e-4e21-4a17-a624-d7818293439e
         idToken: "",
         credentials: null,
+        toastId: "liveToast",
+        toastMessage: "",
         input: {
-          name: null,
-          input_rows: [],
-          values: {}
+          name: "input",
+          input_rows: [
+            {
+              "id": "myselect", 
+              "type": "select",
+              "label": "AWS Action",
+              "options": [
+                {"text": "List S3 Objects","value": "ListObjectsCommand"}, 
+                {"text": "Upload File","value": "UploadFile"}]},
+          ],
+          values: {
+            "myselect": "ListObjectsCommand"
+          }
         },
         output: {
-          name: null,
-          text: ""
+          name: "output",
+          text: "My test output text..."
         },
         inputLogin:{
           input_rows: [
@@ -30,7 +43,14 @@ const store = createStore({
           ],
           values:{
             username: "admin",
-            password: "admin"
+            password: process.env.NODE_ENV === "development" ? "Cisco123!@#": ""
+          },
+        },
+        inputS3Upload:{
+          name: "inputS3Upload",
+          input_rows: [ {"id": "s3fileupload", "type": "file", label: "S3 Upload", information: "Pick a file that you want to upload to a predefined S3 bucket"}  ],
+          values:{
+            s3fileupload: null,
           }
         }
       }

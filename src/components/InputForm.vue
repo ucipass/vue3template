@@ -132,47 +132,23 @@ export default {
       }
     },
     inputChange: function ( ev ) {
+      let payload = []
       if (ev?.target?.files?.length){
-        let payload ={
+        payload ={
           name: this.name,
-          id: name,
-          value: ""
+          id: ev.target.name,
+          value: ev.target.files
         }
-        const file = ev.target.files[0];
-        const name = ev.target.name
-        const reader = new FileReader();
-
-        reader.onload = (e) => {
-          let payload ={
-            name: this.name,
-            id: name,
-            value: e.target.result        
-          }
-          this.$store.commit("setInputValue",payload)
-        }
-
-        reader.onerror = (e) => {
-          alert(e)
-        }
-
-        if (file.size > 1048576) {
-          this.$store.commit("setInputValue",payload)
-          ev.target.value = ""
-          alert("File is larger than 1MByte!")
-        }
-        else{
-          reader.readAsText(file);    
-        }
-        
-      }else{
-        let payload ={
+      }
+      else{
+        payload ={
           name: this.name,
           id: ev.target.name,
           value: ev.target.value          
         }
-        // console.log(payload)
-        this.$store.commit("setInputValue",payload)
       }
+      // console.log(payload)
+      this.$store.commit("setInputValue",payload)
     }
   },
   mounted: function () {

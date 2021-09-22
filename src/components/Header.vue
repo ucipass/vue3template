@@ -48,6 +48,8 @@
 <script>
 import InputForm from './InputForm.vue'
 var AmazonCognitoIdentity = require('amazon-cognito-identity-js');
+import { CognitoIdentityClient } from "@aws-sdk/client-cognito-identity";
+import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
 
 export default {
   name: 'Headers',
@@ -73,15 +75,17 @@ export default {
       window.location.reload()
     },
     login: async function () {
-      let input  = this.$store.state[this.name].values
       let store = this.$store
-      this.$store.commit("setState", {name: "username", value : input.username })
-      this.$store.commit("setState", {name: "password", value : input.password })
+      let input  = this.$store.state[this.name].values
+      store.commit("setState", {name: "username", value : input.username })
+      store.commit("setState", {name: "password", value : input.password })
 
-      const username = this.$store.state.username
-      const password = this.$store.state.password
-      const userPoolId = this.$store.state.userPoolId
-      const clientId = this.$store.state.clientId
+      const username        = store.state.username
+      const password        = store.state.password
+      const region          = store.state.region
+      const userPoolId      = store.state.userPoolId
+      const clientId        = store.state.clientId
+      const identityPoolId  = store.state.identityPoolId
 
       var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
           Username : username,
@@ -102,16 +106,22 @@ export default {
           onSuccess: function (result) {
               // var accessToken = result.getAccessToken().getJwtToken();
               /* Use the idToken for Logins Map when Federating User Pools with identity pools or when passing through an Authorization Header to an API Gateway Authorizer */
-              var idToken = result.idToken.jwtToken;
+              let idToken = result.idToken.jwtToken;
+              let credentials = fromCognitoIdentityPool({
+                  client: new CognitoIdentityClient({region:region}),
+                  identityPoolId: identityPoolId,
+                  logins: { [`cognito-idp.${region}.amazonaws.com/${userPoolId}`] : idToken },
+              })
               store.commit("setState", {name: "idToken", value : idToken })
+              store.commit("setState", {name: "credentials", value : credentials })
               store.commit("setState", {name: "status", value : "Logged in" })
           },
-      
           onFailure: function(err) {
+              store.commit("setState", {name: "idToken", value : "" })
+              store.commit("setState", {name: "credentials", value : null })
               store.commit("setState", {name: "status", value : "Login failed" })
               console.log(err);
           },
-      
       });
 
     }
