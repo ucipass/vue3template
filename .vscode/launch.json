@@ -9,8 +9,14 @@
             "request": "launch",
             "name": "Launch Chrome against localhost",
             "url": "http://localhost:8080",
-            "envFile": "${workspaceFolder}/.env",
-            "webRoot": "${workspaceFolder}"
+            "webRoot": "${workspaceFolder}",
+            // "runtimeArgs": [
+            //     "--require=dotenv/config"
+            // ],
+            // "envFile": "${workspaceFolder}/.env",
+            "env": {
+                "NODE_ENV": "development"
+            },            
         }
     ]
 }

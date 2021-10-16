@@ -11,6 +11,10 @@ import {
     PutObjectCommand, 
     DeleteObjectCommand   
     } from "@aws-sdk/client-s3";
+import { 
+  STSClient, 
+  GetCallerIdentityCommand 
+} from "@aws-sdk/client-sts"; 
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 var AmazonCognitoIdentity = require('amazon-cognito-identity-js');
 import { CognitoIdentityClient } from "@aws-sdk/client-cognito-identity";
@@ -51,19 +55,25 @@ async function logout(){
 async function awsLoginKeys() {
   const accessKeyId     = store.state.accessKeyId
   const secretAccessKey = store.state.secretAccessKey
-  // const credFunction = function (){
-  //   return {
-  //     accessKeyId:      accessKeyId,
-  //     secretAccessKey:  secretAccessKey
-  //   }
-  // }
-
-  store.commit("setState", {name: "credentials", value : function (){
+  const region          = store.state.region
+  let credentials = function (){
     return {
       accessKeyId:      accessKeyId,
       secretAccessKey:  secretAccessKey
     }
-  }})
+  }   
+  const client = new STSClient({ region: region, credentials: credentials });
+  const command = new GetCallerIdentityCommand({});
+  
+  try {
+    const response = await client.send(command);
+    console.log("Logged in as:",response?.Arn)
+  } catch (error) {
+    credentials = null
+    console.log("Login Failed")
+  }
+  store.commit("setState", {name: "credentials", value : credentials})
+  return credentials
 }
 
 async function awsLoginCognito() {
@@ -124,6 +134,7 @@ async function listObjects(){
   let bsAlert = new Toast( document.getElementById('liveToast') );  
   const accessKeyId     = store.state.accessKeyId
   const secretAccessKey = store.state.secretAccessKey
+  const bucket = store.state.bucket
   console.log("HELLO",store.state.credentials())
   const s3Client = new S3Client({
       region: store.state.region,
@@ -133,20 +144,19 @@ async function listObjects(){
         secretAccessKey: secretAccessKey
       }
     });
-  let command = new ListObjectsCommand({ Bucket:  store.state.bucket, Prefix: "files"});
+  let command = new ListObjectsCommand({ Bucket:  bucket, Prefix: "files"});
   return s3Client.send(command)
   .then((result) =>{
     if ( ! result.Contents ) {
-      this.buckets = []
-      return ;
+      return [];
     }
-    this.buckets = result.Contents       
-    for (let index = 0; index < this.buckets.length; index++) {
-      let expireDate = add(this.buckets[index].LastModified, {days: 2})
+    let buckets = result.Contents       
+    for (let index = 0; index < buckets.length; index++) {
+      let expireDate = add(buckets[index].LastModified, {days: 2})
       expireDate.setUTCHours(0, 0, 0, 0)
-      this.buckets[index].expireDate = expireDate
+      buckets[index].expireDate = expireDate
     }
-    // console.log("Success",this.buckets)
+    return buckets
   })
   .catch((result) =>{
     store.state.toastMessage = `S3 folder refresh failed!`

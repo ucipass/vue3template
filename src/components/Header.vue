@@ -47,7 +47,11 @@
 </template>
 <script>
 import InputForm from './InputForm.vue'
-import {awsLoginKeys,logout} from './helpers.js'
+import {
+  awsLoginKeys,
+  // login,
+  logout
+} from './helpers.js'
 
 export default {
   name: 'Headers',
@@ -66,6 +70,7 @@ export default {
   },  
   methods:{
     awsLoginKeys,
+    // login,
     logout,
     reload: function(){
       window.location.reload()
