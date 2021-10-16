@@ -7,7 +7,7 @@
   </div>        
   <div>
       <button 
-        v-if = "$store.state.idToken"
+        v-if = "$store.state.credentials"
         type="button" 
         class="btn btn-outline-light me-1"
         @click="logout()"
@@ -37,7 +37,7 @@
         </div>
         <div class="modal-footer">
           <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="login" >Login</button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="awsLoginKeys" >Login</button>
         </div>
       </div>
     </div>
@@ -47,9 +47,7 @@
 </template>
 <script>
 import InputForm from './InputForm.vue'
-var AmazonCognitoIdentity = require('amazon-cognito-identity-js');
-import { CognitoIdentityClient } from "@aws-sdk/client-cognito-identity";
-import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
+import {awsLoginKeys,logout} from './helpers.js'
 
 export default {
   name: 'Headers',
@@ -65,65 +63,12 @@ export default {
       count (){
           return this.$store.state.count
       }
-      // ,
-      // logged_in () {
-      //   return ( this.$store.statecredentials)
-      // }
   },  
   methods:{
-    logout: function(){
+    awsLoginKeys,
+    logout,
+    reload: function(){
       window.location.reload()
-    },
-    login: async function () {
-      let store = this.$store
-      let input  = this.$store.state[this.name].values
-      store.commit("setState", {name: "username", value : input.username })
-      store.commit("setState", {name: "password", value : input.password })
-
-      const username        = store.state.username
-      const password        = store.state.password
-      const region          = store.state.region
-      const userPoolId      = store.state.userPoolId
-      const clientId        = store.state.clientId
-      const identityPoolId  = store.state.identityPoolId
-
-      var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
-          Username : username,
-          Password : password,
-      });
-    
-      var userPool = new AmazonCognitoIdentity.CognitoUserPool({ 
-          UserPoolId : userPoolId,
-          ClientId : clientId
-      });
-      
-      var cognitoUser = new AmazonCognitoIdentity.CognitoUser({
-          Username : username,
-          Pool : userPool
-      });
-      
-      cognitoUser.authenticateUser(authenticationDetails, {
-          onSuccess: function (result) {
-              // var accessToken = result.getAccessToken().getJwtToken();
-              /* Use the idToken for Logins Map when Federating User Pools with identity pools or when passing through an Authorization Header to an API Gateway Authorizer */
-              let idToken = result.idToken.jwtToken;
-              let credentials = fromCognitoIdentityPool({
-                  client: new CognitoIdentityClient({region:region}),
-                  identityPoolId: identityPoolId,
-                  logins: { [`cognito-idp.${region}.amazonaws.com/${userPoolId}`] : idToken },
-              })
-              store.commit("setState", {name: "idToken", value : idToken })
-              store.commit("setState", {name: "credentials", value : credentials })
-              store.commit("setState", {name: "status", value : "Logged in" })
-          },
-          onFailure: function(err) {
-              store.commit("setState", {name: "idToken", value : "" })
-              store.commit("setState", {name: "credentials", value : null })
-              store.commit("setState", {name: "status", value : "Login failed" })
-              console.log(err);
-          },
-      });
-
     }
   }, 
   mounted(){

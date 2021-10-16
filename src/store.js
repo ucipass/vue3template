@@ -1,5 +1,6 @@
 import { createStore } from 'vuex'
-
+process.env.AWS_ACCESS_KEY_ID
+process.env.AWS_SECRET_ACCESS_KEY
 const store = createStore({
     state () {
       return {
@@ -8,8 +9,10 @@ const store = createStore({
         password: "",
         status: "not logged in",
         socket: null,
-        region: "",  //"us-east-2"
-        bucket: "",  //"accountid_name"
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,  //"us-east-2"
+        region: "us-east=1",  //"us-east-2"
+        bucket: "copysent",  //"accountid_name"
         userPoolId: "", //us-east-2_j3Vcx1Ss3
         clientId: "", //7d725jjrn1ve7gpce38bo06rvp
         identityPoolId: "",  //us-east-2:79ae3f9e-4e21-4a17-a624-d7818293439e
