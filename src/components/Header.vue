@@ -6,23 +6,34 @@
       <label for="floatingStatus">Current Status</label>
   </div>        
   <div>
-      <button 
-        v-if = "$store.state.credentials"
-        type="button" 
-        class="btn btn-outline-light me-1"
-        @click="logout()"
-      >Logout
-      </button>
-      <button 
-        v-else
-        type="button" 
-        class="btn btn-outline-light me-1"
-        data-bs-toggle="modal" 
-        data-bs-target="#loginModal"
-      >Login
-      </button>
+    <button 
+      type="button" 
+      class="btn btn-small btn-outline-light me-1" 
+      data-bs-target="#modalSettings"
+      data-bs-toggle="modal" 
+      data-bs-placement="bottom" title="Settings"
+    >
+      <i class="bi bi-gear align-middle me-1"></i>
+    </button>    
+    <button 
+      v-if = "$store.state.credentials"
+      type="button" 
+      class="btn btn-outline-light me-1"
+      @click="logout()"
+    >Logout
+    </button>
+    <button 
+      v-else
+      type="button" 
+      class="btn btn-outline-light me-1"
+      data-bs-toggle="modal" 
+      data-bs-target="#loginModal"
+    >Login
+    </button>
   </div>
   </div>
+
+  <ModalSettings/>
 
   <!-- Modal -->
   <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
@@ -47,6 +58,7 @@
 </template>
 <script>
 import InputForm from './InputForm.vue'
+import ModalSettings from './ModalSettings.vue'
 import {
   awsLoginKeys,
   // login,
@@ -56,11 +68,11 @@ import {
 export default {
   name: 'Headers',
   components: {
-    InputForm
+    InputForm,ModalSettings
   },
   data() {
     return {
-      name: "inputLogin"
+      name: "inputAWSLogin"
     }
   },
   computed: {
@@ -72,6 +84,9 @@ export default {
     awsLoginKeys,
     // login,
     logout,
+    settings: function(){
+      console.log("Settings")
+    },
     reload: function(){
       window.location.reload()
     }

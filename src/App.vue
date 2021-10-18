@@ -15,6 +15,7 @@
       :name="$store.state.output.name"
       class="m-2"
     />
+    <ToastMessage/>
   </div>
 </template>
 
@@ -22,6 +23,7 @@
 import Header from "./components/Header.vue";
 import InputForm from "./components/InputForm.vue";
 import Output from "./components/Output.vue";
+import ToastMessage from "./components/ToastMessage.vue";
 import { 
   // awsLoginKeys, 
   // listObjects 
@@ -43,6 +45,7 @@ export default {
     InputForm,
     Output,
     Header,
+    ToastMessage,
   },
   data() {
     return {

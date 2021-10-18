@@ -237,7 +237,7 @@ async function saveClipboard() {
 //  GENERAL HELPER FUNCTIONS
 //
 function toastMessage(message){
-    var bsAlert = new Toast( document.getElementById('liveToast') );//inizialize it      
+    var bsAlert = new Toast( document.getElementById('toastMessage') );//inizialize it      
     store.state.toastMessage = message
     bsAlert.show();//show it 
 }
