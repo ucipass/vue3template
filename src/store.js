@@ -2,7 +2,7 @@ import { createStore } from 'vuex'
 const store = createStore({
   state () {
     return {
-      settings: {},
+      settings: {},  // Will be loaded from InputSettings or from LocalStorage
       url: "http://localhost;8000",
       username: "admin",
       password: "",
@@ -42,17 +42,27 @@ const store = createStore({
         name: "inputSettings",
         input_rows: [
           {
+            "id": "storeSettings", 
+            "type": "select",
+            "label": "Store Settings",
+            "information": "If set to yes, settings on webpage is stored on the web browser's \"localStorage\".",
+            "options": [
+              {"text": "Enabled", "value": "enabled"}, 
+              {"text": "Disabled"  , "value": "disabled"}]
+          },
+          {
             "id": "loginType", 
             "type": "select",
             "label": "Login Type",
             "information": "Select the type of authentication type you would like to use.",
             "options": [
-              {"text": "Local Login", "value": "localLogin"}, 
+              {"text": "No Login", "value": "noLogin"}, 
               {"text": "AWS Login"  , "value": "awsLogin"}]
           },
         ],
         values: {
-          "loginType": "localLogin"
+          loginType: "noLogin",
+          storeSettings: "disabled"
         }
       },
       inputLogin:{

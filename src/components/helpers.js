@@ -22,17 +22,19 @@ import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-id
 import { add } from 'date-fns'
 
 export{
-    toastMessage,
-    setStatusMessage,
-    GetSignedUrl,
-    deleteKey,
-    getClipboard,
-    saveClipboard,
-    listObjects,
-    awsLoginCognito,
-    awsLoginKeys,
-    login,
-    logout
+  loadSettings,
+  saveSettings,
+  toastMessage,
+  setStatusMessage,
+  GetSignedUrl,
+  deleteKey,
+  getClipboard,
+  saveClipboard,
+  listObjects,
+  awsLoginCognito,
+  awsLoginKeys,
+  login,
+  logout
 }
 //
 //  LOGIN/LOGOUT
@@ -246,4 +248,35 @@ function setStatusMessage(message){
     store.commit("setState", {name: "status", value : message })
 }
 
+function saveSettings(){
+  if ( store.state.inputSettings.values.storeSettings == "enabled" ){
+    window.localStorage.setItem('settings', JSON.stringify(store.state.inputSettings.values));
+  }else{
+    window.localStorage.setItem('settings', JSON.stringify( {storeSettings: "disabled"} ));
+  }
 
+  //update settings variable in store
+  loadSettings()
+}
+
+function loadSettings(){
+  // Start with empty settings and load values from localStorage and InputSettings default values
+  let settings = {}
+  let localStorageSettings = window.localStorage.getItem('settings').length > 0 ? JSON.parse(window.localStorage.getItem('settings')) : {}
+  let inputSettings = JSON.parse(JSON.stringify(store.state.inputSettings))
+  
+  // if storeSettings is set to true, update InputSettings default values with the values from localStorage
+  if (localStorageSettings.storeSettings == "enabled") {
+    for (const key in localStorageSettings) {
+      inputSettings.values[key] = localStorageSettings[key];
+    }
+    store.commit("setState", {name: "inputSettings", value : inputSettings })    
+  }
+
+  // update settings from InputSettings
+  for (const key in inputSettings.values) {
+    settings[key] = inputSettings.values[key]
+  }
+  store.commit("setState", {name: "settings", value : settings })  
+  console.log("Settings:\n", settings)
+}

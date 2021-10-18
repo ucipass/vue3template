@@ -25,6 +25,7 @@ import InputForm from "./components/InputForm.vue";
 import Output from "./components/Output.vue";
 import ToastMessage from "./components/ToastMessage.vue";
 import { 
+  // loadSettings
   // awsLoginKeys, 
   // listObjects 
 } from "./components/helpers.js";
@@ -62,12 +63,12 @@ export default {
   },
   async mounted() {
     try {
-    console.log("Mounted: App");
-    // awsLoginKeys()
-    // .then(listObjects)
-    // .then((buckets)=>{
-    //   console.log("Buckets:",buckets)
-    // })    
+      console.log("Mounted: App");
+      // awsLoginKeys()
+      // .then(listObjects)
+      // .then((buckets)=>{
+      //   console.log("Buckets:",buckets)
+      // })    
     } catch (error) {
       console.log("App initialization failed!");
       console.log(error);

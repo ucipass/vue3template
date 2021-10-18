@@ -24,7 +24,7 @@
 
 <script>
 import InputForm from './InputForm.vue'
-import { toastMessage } from "./helpers.js"
+import { toastMessage, saveSettings } from "./helpers.js"
 export default {
   name: 'ModalSettings',
   components: {
@@ -65,11 +65,12 @@ export default {
     save: function (){
       let value = JSON.parse(JSON.stringify(this.$store.state.inputSettings.values))
       this.$store.commit("setState", { name: "settings", value: value} )
+      saveSettings()
       toastMessage("Settings Saved.")
     }
   },
   mounted: function () {
-    console.log("Mounted:", this.name)
+    console.log("Mounted:", this.name)   
   }
 }
 </script>
