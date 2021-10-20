@@ -77,8 +77,8 @@ const store = createStore({
       },
       inputAWSLogin:{
         input_rows: [
-          { id: "secretkeyid", label: "Usersecretkeyidname" },
-          { id: "secretkey", label: "secretkey", type: "password"}
+          { id: "secretkeyid", label: "AWS Secret Key Id", information: "You may create or request your key on the AWS Management Console's Identity and Access Management (IAM) security credentials page"},
+          { id: "secretkey", label: "AWS Secret Key", type: "password", information: "You may create or request your key on the AWS Management Console's Identity and Access Management (IAM) security credentials page"},
         ],
         values:{
           secretkeyid: "",
