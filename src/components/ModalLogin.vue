@@ -1,35 +1,40 @@
 <template>
 <!-- Modal -->
-<div class="modal fade" id="modalLogin" tabindex="-1" aria-labelledby="modalLoginLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalLoginLabel">{{title}}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <pre>{{message}}</pre>
-      </div>
-      <div class="modal-footer">
-        <slot name="footer" >
-          <!-- FOOTER FALLBACK BUTTONS -->   
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </slot>        
+  <div class="modal fade" id="modalLogin" tabindex="-1" aria-labelledby="modalLoginLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-dark" id="modalLoginLabel">Login</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-dark">
+          <InputForm :name="inputLoginName"></InputForm>
+        </div>
+        <div class="modal-footer">
+          <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="login()" >Login</button>
+        </div>
       </div>
     </div>
-  </div>
-</div> 
+  </div>   
 </template>
 
 <script>
 import InputForm from './InputForm.vue'
+import {
+  awsLoginKeys,
+  logout
+} from './helpers.js'
+
 export default {
-  name: 'ModalMessage',
+  name: 'ModalLogin',
+  components: {
+    InputForm
+  },
   props: {
     name: {
           type: String,
-          default: "ModalMessage"
+          default: "modalLogin"
         },  
     title: {
           type: String,
@@ -51,8 +56,27 @@ export default {
     config: function (){
       return this.$store.state[this.name]
     },
+    inputLoginName: function(){
+      return "inputAWSLogin"
+    }
   },
   methods:{
+    awsLoginKeys,
+    logout,
+    login: function(){
+      let loginType = this.$store.state.settings.loginType
+      switch(loginType) {
+        case "awsLogin":
+          console.log(`${loginType} started.\n`,this.$store.state.inputAWSLogin.values)
+          awsLoginKeys(this.$store.state.inputAWSLogin.values)
+          break;
+        case "awsLoginCognitoPool":
+          console.log(`${loginType} started.`)
+          break;
+        default:
+          console.log(`${loginType} login type is not implemented.`)
+      }      
+    },
     inputClick: function ( ev ) {
       if ( ev?.target?.type == "file") {
         ev.target.value = ""
@@ -69,3 +93,4 @@ export default {
 <style scoped>
 
 </style>
+

@@ -54,10 +54,10 @@ async function logout(){
   window.location.reload()
 }
 
-async function awsLoginKeys() {
-  const accessKeyId     = store.state.accessKeyId
-  const secretAccessKey = store.state.secretAccessKey
-  const region          = store.state.region
+async function awsLoginKeys(login) {
+  const accessKeyId     = login.secretkeyid
+  const secretAccessKey = login.secretkey
+  const region          = store.state.region ?  store.state.region : "us-east-1"
   let credentials = function (){
     return {
       accessKeyId:      accessKeyId,
@@ -70,9 +70,10 @@ async function awsLoginKeys() {
   try {
     const response = await client.send(command);
     console.log("Logged in as:",response?.Arn)
+    toastMessage(`Logged in as: ${response?.Arn}`)
   } catch (error) {
     credentials = null
-    console.log("Login Failed")
+    console.log("Login Failed\n",error)
   }
   store.commit("setState", {name: "credentials", value : credentials})
   return credentials
@@ -270,7 +271,8 @@ function loadSettings(){
     for (const key in localStorageSettings) {
       inputSettings.values[key] = localStorageSettings[key];
     }
-    store.commit("setState", {name: "inputSettings", value : inputSettings })    
+    store.commit("setState", {name: "inputSettings", value : inputSettings })
+    console.log("Settings loaded from localStorage:\n", settings)
   }
 
   // update settings from InputSettings
@@ -278,5 +280,4 @@ function loadSettings(){
     settings[key] = inputSettings.values[key]
   }
   store.commit("setState", {name: "settings", value : settings })  
-  console.log("Settings:\n", settings)
 }

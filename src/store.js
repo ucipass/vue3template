@@ -6,7 +6,7 @@ const store = createStore({
       url: "http://localhost;8000",
       username: "admin",
       password: "",
-      status: "not logged in",
+      status: "Initialized",
       socket: null,
       accessKeyId: process.env.VUE_APP_AWS_ACCESS_KEY_ID,
       secretAccessKey: process.env.VUE_APP_AWS_SECRET_ACCESS_KEY,
@@ -81,8 +81,8 @@ const store = createStore({
           { id: "secretkey", label: "secretkey", type: "password"}
         ],
         values:{
-          username: "",
-          password: ""
+          secretkeyid: "",
+          secretkey: ""
         },
       },
       inputS3Upload:{

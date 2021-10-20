@@ -1,6 +1,9 @@
 <template>
   <div id="app" class="d-flex flex-column p-0">
     <Header />
+    <ModalSettings/>
+    <ModalLogin/>
+
     <InputForm
       v-if="$store.state.credentials"
       :name="$store.state.input.name"
@@ -20,10 +23,12 @@
 </template>
 
 <script>
-import Header from "./components/Header.vue";
-import InputForm from "./components/InputForm.vue";
-import Output from "./components/Output.vue";
-import ToastMessage from "./components/ToastMessage.vue";
+import Header         from "./components/Header.vue";
+import ModalSettings  from "./components/ModalSettings.vue";
+import ModalLogin     from "./components/ModalLogin.vue";
+import InputForm      from "./components/InputForm.vue";
+import Output         from "./components/Output.vue";
+import ToastMessage   from "./components/ToastMessage.vue";
 import { 
   // loadSettings
   // awsLoginKeys, 
@@ -44,6 +49,8 @@ export default {
   name: "App",
   components: {
     InputForm,
+    ModalSettings,
+    ModalLogin,
     Output,
     Header,
     ToastMessage,
