@@ -47,7 +47,6 @@
           </form>
         </div>
         <textarea 
-          v-show = "$store.state[name].text.length > 0"
           class="mt-1 d-flex flex-grow-1 h-100 form-control terminal text-white bg-dark"
           id="TextAreaOutput"
           rows="10"

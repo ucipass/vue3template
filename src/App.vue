@@ -3,21 +3,12 @@
     <Header />
     <ModalSettings/>
     <ModalLogin/>
-
-    <InputForm
-      v-if="$store.state.credentials"
-      :name="$store.state.input.name"
-      class="border border-2 rounded-3 mt-2 ms-2 me-2 p-2 d-flex overflow-auto"
-    >
+    <InputForm v-if="$store.state.credentials" name="inputTest" class="border border-2 rounded-3 mt-2 ms-2 me-2 p-2 d-flex overflow-auto" >
       <template v-slot:footer>
         <button class="btn btn-primary" @click="submit()">Submit</button>
       </template>
     </InputForm>
-    <Output
-      v-if="$store.state.credentials"
-      :name="$store.state.output.name"
-      class="m-2"
-    />
+    <Output v-if="$store.state.credentials" name="outputTest" class="m-2" />
     <ToastMessage/>
   </div>
 </template>
@@ -64,12 +55,32 @@ export default {
     };
   },
   methods: {
-    submit: function () {
-      console.log("Input Submit");
+    submit: async function () {
+      let input = {}
+      let values = this.$store.state.inputTest.values
+      for ( let key in values)
+        if (typeof values[key] == "object") {
+          input[key] = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.addEventListener("load", () => {
+              resolve(reader.result);
+            }, false);
+            reader.addEventListener("error", () => {
+              reject("Cannot read file");
+            });
+            reader.readAsText(values[key][0]);
+          });
+        }else{
+          input[key] = values[key] 
+        }
+        
+      this.$store.commit("setOutput" , { name: "outputTest", text: JSON.stringify(input,2,2)})
+      console.log("Input Submit",input);
     },
   },
   async mounted() {
     try {
+      if ( this.$store.state.settings?.loginType == "noLogin" ) this.$store.commit("setState", {name: "credentials", value : true})
       console.log("Mounted: App");
       // awsLoginKeys()
       // .then(listObjects)

@@ -23,6 +23,7 @@
 import InputForm from './InputForm.vue'
 import {
   awsLoginKeys,
+  awsLoginCognito,
   logout
 } from './helpers.js'
 
@@ -57,7 +58,9 @@ export default {
       return this.$store.state[this.name]
     },
     inputLoginName: function(){
-      return "inputAWSLogin"
+      let name = "inputLogin" + this.$store.state.settings.loginType
+      console.log("Logintype",name)
+      return name 
     }
   },
   methods:{
@@ -66,12 +69,13 @@ export default {
     login: function(){
       let loginType = this.$store.state.settings.loginType
       switch(loginType) {
-        case "awsLogin":
-          console.log(`${loginType} started.\n`,this.$store.state.inputAWSLogin.values)
-          awsLoginKeys(this.$store.state.inputAWSLogin.values)
+        case "AWSSecretKeys":
+          console.log(`${loginType} started.\n`,this.$store.state.inputLoginAWSSecretKeys.values)
+          awsLoginKeys(this.$store.state.inputLoginAWSSecretKeys.values)
           break;
-        case "awsLoginCognitoPool":
+        case "AWSCognitoUserPool":
           console.log(`${loginType} started.`)
+          awsLoginCognito(this.$store.state.inputLoginAWSCognitoUserPool.values)
           break;
         default:
           console.log(`${loginType} login type is not implemented.`)

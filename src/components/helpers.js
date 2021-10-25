@@ -73,61 +73,76 @@ async function awsLoginKeys(login) {
     toastMessage(`Logged in as: ${response?.Arn}`)
   } catch (error) {
     credentials = null
+    toastMessage(`Logged failed!`)
     console.log("Login Failed\n",error)
   }
   store.commit("setState", {name: "credentials", value : credentials})
   return credentials
 }
 
-async function awsLoginCognito() {
-  store.commit("setState", {name: "username", value : store.state.inputLogin.values.username })
-  store.commit("setState", {name: "password", value : store.state.inputLogin.values.password })
-
-  const username        = store.state.username
-  const password        = store.state.password
-  const region          = store.state.region
-  const userPoolId      = store.state.userPoolId
-  const clientId        = store.state.clientId
-  const identityPoolId  = store.state.identityPoolId
-
-  var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
-      Username : username,
-      Password : password,
-  });
-
-  var userPool = new AmazonCognitoIdentity.CognitoUserPool({ 
-      UserPoolId : userPoolId,
-      ClientId : clientId
-  });
+function awsGetCognitoToken(username,password,userPoolId,clientId) {
+  return new Promise((resolve, reject) => {
   
-  var cognitoUser = new AmazonCognitoIdentity.CognitoUser({
-      Username : username,
-      Pool : userPool
-  });
+    var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
+        Username : username,
+        Password : password,
+    });
   
-  cognitoUser.authenticateUser(authenticationDetails, {
-      onSuccess: function (result) {
-          // var accessToken = result.getAccessToken().getJwtToken();
-          /* Use the idToken for Logins Map when Federating User Pools with identity pools or when passing through an Authorization Header to an API Gateway Authorizer */
-          let idToken = result.idToken.jwtToken;
-          let credentials = fromCognitoIdentityPool({
-              client: new CognitoIdentityClient({region:region}),
-              identityPoolId: identityPoolId,
-              logins: { [`cognito-idp.${region}.amazonaws.com/${userPoolId}`] : idToken },
-          })
-          store.commit("setState", {name: "idToken", value : idToken })
-          store.commit("setState", {name: "credentials", value : credentials })
-          store.commit("setState", {name: "status", value : "Logged in" })
-      },
-      onFailure: function(err) {
-          store.commit("setState", {name: "idToken", value : "" })
-          store.commit("setState", {name: "credentials", value : null })
-          store.commit("setState", {name: "status", value : "Login failed" })
-          console.log(err);
-      },
+    var userPool = new AmazonCognitoIdentity.CognitoUserPool({ 
+        UserPoolId : userPoolId,
+        ClientId : clientId
+    });
+    
+    var cognitoUser = new AmazonCognitoIdentity.CognitoUser({
+        Username : username,
+        Pool : userPool
+    });
+    
+    cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: function (tokens) {
+          resolve(tokens)
+        },
+        onFailure: function(error) {
+          reject(error)
+        },
+    });
+        
   });
 
 }
+
+async function awsLoginCognito(login) {
+  const username        = login.username
+  const password        = login.password
+  const region          = store.state.settings.region
+  const userPoolId      = store.state.settings.userPoolId
+  const clientId        = store.state.settings.clientId
+  const identityPoolId  = store.state.settings.identityPoolId
+  try {
+ 
+    let tokens = await awsGetCognitoToken(username,password,userPoolId,clientId)
+    sessionStorage.setItem('tokens', JSON.stringify(tokens));
+
+    let idToken = tokens.idToken.jwtToken;
+    let credentials = fromCognitoIdentityPool({
+        client: new CognitoIdentityClient({region:region}),
+        identityPoolId: identityPoolId,
+        logins: { [`cognito-idp.${region}.amazonaws.com/${userPoolId}`] : idToken },
+    })
+    store.commit("setState", {name: "idToken", value : idToken })
+    store.commit("setState", {name: "credentials", value : credentials })
+    store.commit("setState", {name: "status", value : "Logged in" })
+    toastMessage(`Logged in as: ${username}`)            
+  } catch (error) {
+    store.commit("setState", {name: "idToken", value : "" })
+    store.commit("setState", {name: "credentials", value : null })
+    store.commit("setState", {name: "status", value : "Login failed" })
+    toastMessage(`Login failes as: ${username}`)     
+    console.log(error);    
+  }
+
+}
+
 
 //
 //  S3 HELPER FUNCTIONS
@@ -263,7 +278,31 @@ function saveSettings(){
 function loadSettings(){
   // Start with empty settings and load values from localStorage and InputSettings default values
   let settings = {}
-  let localStorageSettings = window.localStorage.getItem('settings').length > 0 ? JSON.parse(window.localStorage.getItem('settings')) : {}
+  let localStorageSettings = window.localStorage.getItem('settings')
+  try {
+    let tokens = sessionStorage.getItem('tokens');
+    tokens = JSON.parse(tokens)
+    let idToken = tokens.idToken.jwtToken;
+    if (tokens.idToken.payload.exp - Date.now()/1000 > 0  ){
+      const region          = store.state.settings.region
+      const userPoolId      = store.state.settings.userPoolId
+      const identityPoolId  = store.state.settings.identityPoolId      
+      let credentials = fromCognitoIdentityPool({
+          client: new CognitoIdentityClient({region:region}),
+          identityPoolId: identityPoolId,
+          logins: { [`cognito-idp.${region}.amazonaws.com/${userPoolId}`] : idToken },
+      })         
+      store.commit("setState", {name: "idToken", value : idToken })
+      store.commit("setState", {name: "credentials", value : credentials })
+      store.commit("setState", {name: "status", value : "Logged in" })
+    }
+  } catch (error) {
+        console.log("No existing AWS tokens cached...",error.toString())
+  }
+
+
+  
+  localStorageSettings = localStorageSettings?.length > 0 ? JSON.parse(window.localStorage.getItem('settings')) : {}
   let inputSettings = JSON.parse(JSON.stringify(store.state.inputSettings))
   
   // if storeSettings is set to true, update InputSettings default values with the values from localStorage
