@@ -152,7 +152,7 @@ export default {
     }
   },
   mounted: function () {
-    console.log("Mounted Input:", this.name)
+    console.log("Mounted: Input -", this.name)
   }
 }
 </script>

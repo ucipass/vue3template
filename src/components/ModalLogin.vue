@@ -35,7 +35,7 @@ export default {
   props: {
     name: {
           type: String,
-          default: "modalLogin"
+          default: "ModalLogin"
         },  
     title: {
           type: String,

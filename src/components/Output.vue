@@ -105,7 +105,7 @@ export default {
     }
   },
   mounted: function () {
-    console.log("Mounted Output:", this.name)
+    console.log("Mounted: Output -", this.name)
   }  
 }
 

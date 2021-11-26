@@ -59,7 +59,7 @@ export default {
       let input = {}
       let values = this.$store.state.inputTest.values
       for ( let key in values)
-        if (typeof values[key] == "object") {
+        if ( values[key] && typeof values[key] == "object") {
           input[key] = await new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.addEventListener("load", () => {
