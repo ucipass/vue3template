@@ -1,6 +1,6 @@
 <script setup>
 import NavBar from "./components/NavBar.vue";
-import MainPage from "./components/MainPage.vue";
+import PageMain from "./components/PageMain.vue";
 import { onMounted } from 'vue'
 
 onMounted(() => {
@@ -10,7 +10,7 @@ onMounted(() => {
 
 <template>
   <NavBar/>
-  <MainPage/>
+  <PageMain/>
 </template>
 
 <style>
@@ -18,7 +18,7 @@ html, body, #app {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: red;
+  background: grey;
 }
 
 </style>
