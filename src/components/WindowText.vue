@@ -32,7 +32,7 @@ onMounted(() => {
           class="flex-grow-1 text-light p-1 bg-dark border-0" 
           cols="5" rows="5" contenteditable spellcheck="false" 
           readonly
-        >{{ state.text }}</textarea>
+        >{{state.text}}</textarea>
       </div>
 </template>
 
