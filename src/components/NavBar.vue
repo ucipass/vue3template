@@ -2,6 +2,7 @@
 import { onMounted } from "vue";
 import { store } from "../store.js"
 import ButtonIcon from "./ButtonIcon.vue";
+import { Modal } from 'bootstrap'
 
 function login(){
   store.loggedIn = true
@@ -15,6 +16,12 @@ function trash(){
   store.textarea = ""
 }
 
+function rooms(){
+  let elem = document.getElementById("modalRooms")
+  let modal = new Modal(elem)
+  modal.show()    
+}
+
 onMounted(() => {
 
 });
@@ -23,13 +30,16 @@ onMounted(() => {
 <template>
   <nav id="Navbar" class="ps-1 pe-1 navbar sticky-top navbar-expand navbar-dark bg-dark justify-content-between">
       <div class="btn-group">
-        <ButtonIcon icon="house-door" text="Home"/>
-        <ButtonIcon icon="clipboard" text="copy"/>
-        <ButtonIcon icon="trash" text="clear" @click="trash"/>
+        <ButtonIcon icon="list-task"  text="Sources" @click="rooms"/>
+        <ButtonIcon icon="trash"      text="Clear" @click="trash"/>
+        <ButtonIcon v-if="false" icon="house-door" text="Home"/>
+        <ButtonIcon v-if="false" icon="clipboard"  text="Copy"/>
       </div>        
       <div class="btn-group">
+<!-- 
         <ButtonIcon v-if="!store.loggedIn" @click="login " icon="box-arrow-in-right" text="Login"/>
         <ButtonIcon v-if=" store.loggedIn" @click="logout" icon="box-arrow-right"    text="Logout"/>
+ -->
         <ButtonIcon icon="gear" text="Settings"/>
       </div>         
   </nav>

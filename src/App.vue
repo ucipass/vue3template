@@ -1,16 +1,19 @@
 <script setup>
-import NavBar from "./components/NavBar.vue";
-import PageMain from "./components/PageMain.vue";
+import NavBar     from "./components/NavBar.vue";
+import PageMain   from "./components/PageMain.vue";
+import ModalRooms from "./components/ModalRooms.vue";
 import { onMounted } from 'vue'
 
 onMounted(() => {
   console.log(`Mounted: App`)
+
 })
 </script>
 
 <template>
   <NavBar/>
   <PageMain/>
+  <ModalRooms/>
 </template>
 
 <style>

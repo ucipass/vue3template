@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 export const store = reactive({
   textarea: "",
   loggedIn: false,
-  socket: io(process.env.NODE_ENV == "development" ? "http://localhost:5000" : ""),
+  socket: io("http://localhost:5000"),
   series: null,
   chart:{
     series: null,
@@ -13,3 +13,5 @@ export const store = reactive({
   }
 
 })
+
+

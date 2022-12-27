@@ -7,7 +7,6 @@ let state = reactive({ text: "", id: null})
 
 onBeforeMount(()=>{
   state.id = crypto.randomUUID()
-  console.log(state.id)
 })
 
 onMounted(() => {
