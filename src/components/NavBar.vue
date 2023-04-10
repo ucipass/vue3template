@@ -22,6 +22,12 @@ function rooms(){
   modal.show()    
 }
 
+function socketio(){
+  let elem = document.getElementById("modalSocketIO")
+  let modal = new Modal(elem)
+  modal.show()    
+}
+
 onMounted(() => {
 
 });
@@ -40,7 +46,8 @@ onMounted(() => {
         <ButtonIcon v-if="!store.loggedIn" @click="login " icon="box-arrow-in-right" text="Login"/>
         <ButtonIcon v-if=" store.loggedIn" @click="logout" icon="box-arrow-right"    text="Logout"/>
  -->
-        <ButtonIcon icon="gear" text="Settings"/>
+ <ButtonIcon icon="lightning" text="Socket.io" @click="socketio"/>
+ <ButtonIcon icon="gear" text="Settings"/>
       </div>         
   </nav>
 </template>

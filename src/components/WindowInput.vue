@@ -1,62 +1,179 @@
 <template>
-    <div :id="idInput" class="container mt-3 mb-3 p-0">
+    <div :id="inputId" class="container mt-3 mb-3 p-0 bg-white text-dark">
 
       <!-- BODY WITH DYNAMIC INPUTS   -->
-      <div class="d-flex" >
+      <div class="d-flex align-items-center justify-content-center" >
+
+        <!-- LABLE COLUMN -->
         <div class="d-flex flex-column justify-content-between">
-            <div v-for="input in inputs" :key="input.id" class="m-1 d-flex justify-content-end">
-                  <label class="m-1 float-right text-nowrap" :for="input.id">{{input.label}}</label>
-                  <span class="m-1 float-right"  v-tooltip:left="input.information">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
-                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                      <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-                    </svg>                
-                  </span>
+          <div v-for="input in computed_inputs" :key="input.id" :style="input.style" class="m-1 d-flex justify-content-end">
+
+            <!-- LABEL -->
+            <div class="border border-3 border-white d-flex align-items-center justify-content-center">
+              <label class="p-1 float-center text-nowrap" :for="input.id">{{input.label}}</label>
             </div>
+
+            <!-- ICON -->
+            <div class="d-flex align-items-center justify-content-center">
+              <!-- <i class="bi bi-info-circle"></i> -->
+              <WindowInputIcon icon="info-circle"  :text="input.information"/>
+            </div>
+
+          </div>
         </div>      
 
+        <!-- INPUT COLUMN -->
         <div class="d-flex flex-column justify-content-between w-100">
-            <div v-for="input in inputs" :key="input.id" class=" m-1 ">
-                    <input 
-                      class="form-control" 
-                      :type="input.type" 
-                      :name="input.id"
-                      :id="config.id + input.id" 
-                      :placeholder="input.placeholder" 
-                      v-model="values[input.id]" 
-                      @change="inputChange"
-                      @click="inputClick"
-                    >
-            </div>
+          <div v-for="input in computed_inputs" :key="input.id" class=" m-1 ">
+            
+            <!-- INPUT TEXTAREA -->
+            <textarea v-if="input.type=='textarea'" 
+              class="form-control" 
+              :style="input.style"
+              :placeholder="input.placeholder"
+              v-model="inputs[input.id].value" 
+            ></textarea>        
+
+            <!-- INPUT SELECT -->
+            <select v-else-if="input.type=='select'" 
+              class="form-select"
+              :value="inputs[input.id].value"
+              @change="event => inputs[input.id].value = event.target.value"
+              aria-label="select-input"
+            ><option v-for="item in input.options" :key="item.text" :value="item.value" > {{item.text}} </option>
+            </select>
+
+            <!-- INPUT FILE -->
+            <input v-else-if="input.type=='file'" 
+              class="form-control" 
+              :type="input.type"
+              :name="input.name"
+              @change="fileChange"
+            > 
+
+
+            <!-- @click="event => inputs[input.id].value = null"fff
+              @change="event => inputs[input.id].value = event.target.files" -->
+
+            <!-- INPUT TEXT -->
+            <input v-else
+              class="form-control" 
+              :type="input.type"
+              :placeholder="input.placeholder" 
+              v-model="inputs[input.id].value" 
+              @click="inputClick"
+              @keyup.enter="$emit('submit', inputs)"
+            >
+          </div>
         </div>
 
       </div>
 
       <!-- FOOTER -->
-      <div class="d-flex justify-content-end m-1">
-        <!-- FOOTER FALLBACK -->    
-        <slot name="footer" v-bind:footer="values">
+      <div class="d-flex justify-content-end m-0">
+        <slot name="footer" >
+        <!-- FOOTER FALLBACK reference bt <template #footer></template>-->    
         </slot>
       </div>
-
 
     </div>
 </template>
     
 <script setup>
-import {  ref, reactive, onMounted, onBeforeMount } from 'vue'
+import {  ref, reactive, onMounted, onBeforeMount, computed, watch } from 'vue'
 import { store } from '../store.js'
+import WindowInputIcon from "./WindowInputIcon.vue";
 
-let state = reactive({ text: "", id: null})
+const props = defineProps(
+  {
+    id: { type: String, required: false, default: 'input' }
+  }
+)
 
-const idInput = ref(0);
+const inputId = ref(0);
+
+const error_inputs  = reactive({
+  username: { 
+    label: "Username", 
+    type: "text",
+    placeholder: "Enter username here...there is an error",
+    information: "If you see this there is an error!",
+    value: ""
+  },
+  password: { 
+    label: "Password", 
+    type: "password",
+    placeholder: "Enter password here...there is an error",
+    information: "If you see this there is an error!",
+    value: ""
+  },
+  textarea: { 
+    label: "Textarea", 
+    type: "textarea",
+    placeholder: `If you see this there is an error: invalid store.inputs[${props.id}]  not found or invalid!`,
+    information: `If you see this there is an error: invalid store.inputs[${props.id}] not found or invalid!`,
+    value: ""
+  },
+})
+
+const inputs = props.id && store.inputs && store.inputs[props.id] ? store.inputs[props.id] : error_inputs
+
+
+// PRINT OUT FILE WHEN CHANGE
+// watch(inputs.certfile, async (old_file, new_file) => {
+//   if ( new_file.value){
+//     var reader = new FileReader();
+//     reader.onload = function() {
+//       console.log(reader.result)
+//     };
+//     reader.readAsText(new_file.value);
+//   }
+// })
+
+
+const computed_inputs = computed(() => {
+  const inputs_object = inputs
+  const inputs_array  = []
+  for (const id in inputs_object) {
+    if (Object.hasOwnProperty.call(inputs_object, id)) {
+      inputs_array.push({
+        id          : id,
+        name        : id,
+        label       : inputs_object[id].label ? inputs_object[id].label : id,
+        type        : inputs_object[id].type  ? inputs_object[id].type :  "text",
+        placeholder : inputs_object[id].placeholder ? inputs_object[id].placeholder : "",
+        information : inputs_object[id].information ? inputs_object[id].information : id,
+        options     : inputs_object[id].options ? inputs_object[id].options : [],
+        style       : inputs_object[id].type == "textarea" ?  "resize: none;height: 100px" : null
+      })
+    }
+  }
+  return inputs_array;
+
+})
+function fileChange(e){
+  if ( e.target.files && e.target.files[0] ){
+    inputs[e.target.name].value = e.target.files[0] 
+    // console.log(e.target.name,"has new value:", e.target.files[0] )
+  }
+  else{
+    inputs[e.target.name].value = null
+    // console.log(e.target.name,"set to null")
+  }
+
+}
+
+function fileClick(e){
+  console.log("fileClick",e.target)
+}
 
 onBeforeMount(()=>{
-    idInput.value = "input-"+crypto.randomUUID()
+  inputId.value = props.id ? props.id : "input-" + crypto.randomUUID()
 })
 
 onMounted(() => {
-    console.log(`Mounted: WindowInput`, idInput.value)
+    console.log(`Mounted: WindowInput`, inputId.value)
+   
 })
 </script>
 

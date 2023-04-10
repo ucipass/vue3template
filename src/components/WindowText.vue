@@ -25,7 +25,7 @@ onMounted(() => {
 </script>
 
 <template>
-      <div class="d-flex flex-column flex-grow-1 bg-secondary overflow-auto ">   
+      <div class="d-flex flex-column flex-grow-1 bg-secondary overflow-auto border border-secondary ">   
         <textarea 
           :id=state.id
           class="flex-grow-1 text-light p-1 bg-dark border-0" 
