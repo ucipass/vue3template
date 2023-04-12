@@ -65,7 +65,7 @@ onMounted(() => {
         // console.log("Socket.io is connecting to:", store.inputs.socketio.url.value)
         connect ()
     }else{
-        console.log("Socket.io connection disabled")
+        // console.log("Socket.io auto connection disabled")
     }
 });
 

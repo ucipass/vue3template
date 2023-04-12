@@ -3,6 +3,10 @@ import NavBar     from "./components/NavBar.vue";
 import PageMain   from "./components/PageMain.vue";
 import ModalRooms from "./components/ModalRooms.vue";
 import ModalSocketIO from "./components/ModalSocketIO.vue";
+import ModalAWSSettings from "./components/ModalAWSSettings.vue";
+
+
+
 import { onMounted } from 'vue'
 
 onMounted(() => {
@@ -16,6 +20,7 @@ onMounted(() => {
   <PageMain/>
   <ModalRooms/>
   <ModalSocketIO/>
+  <ModalAWSSettings/>
 </template>
 
 <style>

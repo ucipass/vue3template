@@ -28,6 +28,13 @@ function socketio(){
   modal.show()    
 }
 
+function aws_settings(){
+  let elem = document.getElementById("modalAWSSettings")
+  let modal = new Modal(elem)
+  modal.show()    
+}
+
+
 onMounted(() => {
 
 });
@@ -46,7 +53,8 @@ onMounted(() => {
         <ButtonIcon v-if="!store.loggedIn" @click="login " icon="box-arrow-in-right" text="Login"/>
         <ButtonIcon v-if=" store.loggedIn" @click="logout" icon="box-arrow-right"    text="Logout"/>
  -->
- <ButtonIcon icon="lightning" text="Socket.io" @click="socketio"/>
+ <ButtonIcon icon="cloud" text="AWS Settings" @click="aws_settings"/>
+ <ButtonIcon icon="lightning" text="Socket.io Settings" @click="socketio"/>
  <ButtonIcon icon="gear" text="Settings"/>
       </div>         
   </nav>
