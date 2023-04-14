@@ -42,6 +42,10 @@ onMounted(() => {
 
 <template>
   <nav id="Navbar" class="ps-1 pe-1 navbar sticky-top navbar-expand navbar-dark bg-dark justify-content-between">
+    <div class="form-floating ms-0">
+      <input readonly type="text" class="form-control bg-dark text-white" id="floatingStatus" placeholder="Status" value="Not logged in">
+      <label class="text-white" for="floatingStatus">Current Status</label>
+  </div>       
       <div class="btn-group">
         <ButtonIcon icon="list-task"  text="Sources" @click="rooms"/>
         <ButtonIcon icon="trash"      text="Clear" @click="trash"/>

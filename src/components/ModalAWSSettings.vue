@@ -7,9 +7,7 @@ import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-id
 // var AmazonCognitoIdentity = require('amazon-cognito-identity-js');
 import {	AuthenticationDetails, CognitoUserPool, CognitoUser } from 'amazon-cognito-identity-js';
 import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts"
-
-let connected = ref(false)
-let active = ref(false)
+import { getUnixTime } from 'date-fns'
 
 function connect(){
 }
@@ -20,14 +18,12 @@ function disconnect(){
 function save(){
 }
 
-async function login () {
-
+async function getIdToken () {
   const username        = store.inputs.awsSettings.username.value
   const password        = store.inputs.awsSettings.password.value
-  const region          = store.inputs.awsSettings.region.value
   const userPoolId      = store.inputs.awsSettings.userPoolId.value
   const clientId        = store.inputs.awsSettings.clientId.value
-  const identityPoolId  = store.inputs.awsSettings.identityPoolId.value
+
   var authenticationDetails = new AuthenticationDetails({
       Username : username,
       Password : password,
@@ -43,37 +39,50 @@ async function login () {
       Pool : userPool
   });
 
-  const idToken = await new Promise((resolve, reject) => {
+  // Return idToken
+  const t = await new Promise((resolve, reject) => {
     cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: function (result) {
             // var accessToken = result.getAccessToken().getJwtToken();
             /* Use the idToken for Logins Map when Federating User Pools with identity pools or when passing through an Authorization Header to an API Gateway Authorizer */
             let idToken = result.idToken.jwtToken;
-            // console.log(idToken)
+            localStorage.setItem( "idToken", idToken)
+            localStorage.setItem( "idToken_expiration", getUnixTime(Date.now()) + 3600) // 1 hour expiration
             resolve(idToken)
         },
         onFailure: function(err) {
+            store.aws.idToken = ""    
+            localStorage.removeItem( "idToken", idToken)
+            localStorage.removeItem( "idToken_expiration", getUnixTime(Date.now()) + 3600) // 1 hour expiration
             console.log(err);
             resolve(null)
         },
     });    
   });
+  return t;
+}
 
-  if (idToken) {
+async function getCredentials () {  
+  const region          = store.inputs.awsSettings.region.value
+  const userPoolId      = store.inputs.awsSettings.userPoolId.value
+  const identityPoolId  = store.inputs.awsSettings.identityPoolId.value
+
+  const currentTime = getUnixTime(Date.now()) 
+  const idToken = localStorage.getItem("idToken")
+  const idToken_expiration = parseInt( localStorage.getItem("idToken_expiration") )
+
+  if ( idToken && idToken_expiration > currentTime ) {
     store.aws.idToken = idToken
     store.inputs.awsSettings.idToken.value = idToken
-    let credentials = fromCognitoIdentityPool({
+    const credentials = fromCognitoIdentityPool({
         client: new CognitoIdentityClient({region:region}),
         identityPoolId: identityPoolId,
         logins: { [`cognito-idp.${region}.amazonaws.com/${userPoolId}`] : idToken },
     })
-
-    store.aws.credentials = credentials
-    store.aws.status = "Logged in"
-    
+   
     const config = {
-      region: store.inputs.awsSettings.region.value,
-      credentials: store.aws.credentials
+      region: region,
+      credentials: credentials
     }   
     
     const client = new STSClient(config);
@@ -83,21 +92,36 @@ async function login () {
     store.inputs.awsSettings.account.value = response.Account
     store.inputs.awsSettings.userid.value = response.UserId
     store.inputs.awsSettings.arn.value = response.Arn
-    let creds = await store.aws.credentials()
+    let creds = await credentials()
     store.inputs.awsSettings.accessKeyId.value = creds.accessKeyId
-    store.inputs.awsSettings.secretAccessKey.value = creds.secretAccessKey
-    
-
+    store.inputs.awsSettings.secretAccessKey.value = creds.secretAccessKey   
+    store.aws.credentials = credentials
+    store.aws.status = "Logged in"
   } else {
-    store.aws.idToken = ""
+    localStorage.removeItem("idToken");
+    localStorage.removeItem("idToken_expiration");
     store.aws.credentials = null
     store.aws.status = "Login failure"    
   }
 
 }
 
+async function login(){
+  let t = await getIdToken()
+  let c = await getCredentials()
+}
+
+async function logout(){
+  localStorage.removeItem("idToken");
+  localStorage.removeItem("idToken_expiration");
+  store.aws.credentials = null
+}
+
+const connected = computed(() => store.aws && store.aws.credentials ? true : false)
+
 onMounted(() => {
     console.log(`Mounted: ModalAWSettings`)
+    getCredentials()
 
 });
 
@@ -116,8 +140,8 @@ onMounted(() => {
             <WindowInput id="awsSettings"/>
           </div>
           <div class="modal-footer">
-            <button v-if="!connected && !active " type="button" class="btn btn-secondary" @click="login">Login</button>
-            <button v-if="connected || active" type="button" class="btn btn-secondary" @click="disconnect" >Disconnect</button>
+            <button v-if="!connected" type="button" class="btn btn-secondary" @click="login">Login</button>
+            <button v-if="connected" type="button" class="btn btn-secondary" @click="logout" >Logout</button>
             <button type="button" class="btn btn-secondary" @click="save">Save</button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>

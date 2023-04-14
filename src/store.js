@@ -87,6 +87,15 @@ export const store = reactive({
         ],
       },
     },    
+    awsUpload:{
+      file: { 
+        label: "Upload", 
+        type: "file",
+        placeholder: "Upload",
+        information: "Pick the file that needs to be uploaded!",
+        value: ""
+      },      
+    },
     awsSettings:{
       username: { 
         label: "Username", 

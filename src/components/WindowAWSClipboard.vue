@@ -4,7 +4,8 @@ import { store } from '../store.js'
 import { Signer } from "@aws-amplify/core"
 
 
-let state = reactive({ text: "", id: null})
+const state = reactive({ text: "", id: null})
+const localWebSocketId =  makeid(5)  // random id for my websocket connection
 
 // Creates random ID for websocket
 function makeid (length) {
@@ -25,7 +26,7 @@ async function wsconnect () {
       }
   let url = Signer.signUrl(urlToSign,accessInfo)
 
-  let localWebSocketId =  makeid(5)  // random id for my websocket connection
+  
   let lastClipboard = store.aws.clipboard // store last clipboard content before change
   let lockClipboard = false // To prevent message sending while receiving message
   let wsSenderInterval = null // my loop interval for checking changes and push it via Websocket if there's a change
