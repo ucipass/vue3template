@@ -88,16 +88,20 @@ onMounted( async () => {
   wsconnect()
 })
 
-
 </script>
- 
 
 <template>
   <div class="d-flex flex-column flex-fill">
-    <textarea class="form-control d-flex flex-fill" name="clipboardTextarea" id="clipboardTextarea" cols="30" rows="10" v-model="store.aws.clipboard"></textarea>
+    <textarea 
+      class="form-control d-flex flex-fill" 
+      name="clipboardTextarea" 
+      id="clipboardTextarea" 
+      cols="30" rows="10" 
+      placeholder="Share securely here with others..."
+      v-model="store.aws.clipboard">
+    </textarea>
   </div>
 </template>
 
 <style scoped>
-
 </style>
