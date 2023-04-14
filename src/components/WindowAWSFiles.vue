@@ -3,7 +3,8 @@ import WindowInput from "./WindowInput.vue";
 import {  reactive, onMounted, onBeforeMount, watch } from 'vue'
 import { store } from '../store.js'
 import { Signer } from "@aws-amplify/core"
-import { S3Client, ListObjectsCommand } from "@aws-sdk/client-s3";
+import { S3, S3Client, ListObjectsCommand } from "@aws-sdk/client-s3";
+import { Upload as UploadMulti } from "@aws-sdk/lib-storage";
 import { add , format } from 'date-fns'
 
 let state = reactive({ 
@@ -16,8 +17,8 @@ let state = reactive({
 
 async function listObjects(){
   let credentials = store.aws.credentials
-  let region = store.inputs.awsSettings.region.value
-  let bucket = store.inputs.awsSettings.s3BucketName.value
+  let region      = store.inputs.awsSettings.region.value
+  let bucket      = store.inputs.awsSettings.s3BucketName.value
   let file_prefix =  "files"
 
   const s3Client = new S3Client({
@@ -37,9 +38,67 @@ async function listObjects(){
     }  
 }
 
-function upload(file){
-  state.uploadOngoing = true
-  console.log(file)
+function readFileToConsole(file){
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    console.log(evt.target.result);
+  };
+  reader.readAsText(file)  
+}
+
+async function upload(file){
+  let credentials = store.aws.credentials
+  let region      = store.inputs.awsSettings.region.value
+  let bucket      = store.inputs.awsSettings.s3BucketName.value
+  let uploadPartSize = "5242880"
+  let file_prefix =  "files"
+  const config = { region: region,  credentials: credentials  }
+
+  const uploadParams = {
+    Bucket:  bucket,
+    Key: file_prefix + "/" + file.name,
+    Body: file
+  };
+
+
+  try {
+    const parallelUploads3 = new UploadMulti({
+      client: new S3(config) || new S3Client(config),
+      queueSize: 2, // optional concurrency configuration
+      partSize: uploadPartSize, // optional size of each part
+      leavePartsOnError: false, // optional manually handle dropped parts
+      params: uploadParams
+    });    
+
+    parallelUploads3.on("httpUploadProgress", (progress) => {
+      console.log(progress);
+    });  
+    const p = parallelUploads3.done()
+    const t = await p      
+  } catch (e) {
+    console.log(e);
+  }
+
+  
+  // parallelUploads3.on("httpUploadProgress", (progress) => {
+  //   state.uploadOngoing = true
+  //   let percent = ((progress.loaded/progress.total)*100).toFixed(2)
+  //   if ( percent != 100) {
+  //     // this.$store.commit("setStatus", `Uploading: ${percent}%`)
+  //     state.uploadPercent = percent.toString()
+  //   }
+  //   else {
+  //     // this.$store.commit("setStatus", `Upload Complete`)
+  //     state.uploadPercent = "100"
+  //   }
+  // });  
+
+
+
+
+
+  return t
+
 }
 
 function uploadStop(file){

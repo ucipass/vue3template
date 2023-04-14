@@ -151,9 +151,21 @@ const computed_inputs = computed(() => {
   return inputs_array;
 
 })
+
+function readFileToConsole(file){
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    console.log(evt.target.result);
+  };
+  reader.readAsText(file)  
+}
+
+
+
 function fileChange(e){
   if ( e.target.files && e.target.files[0] ){
     inputs[e.target.name].value = e.target.files[0] 
+    // readFileToConsole(inputs[e.target.name].value)
     // console.log(e.target.name,"has new value:", e.target.files[0] )
   }
   else{
