@@ -1,10 +1,14 @@
 <script setup>
-import {  reactive, onMounted, onBeforeMount } from 'vue'
+import {  reactive, onMounted, onBeforeMount, onUnmounted } from 'vue'
 import { store } from '../store.js'
 import { Signer } from "@aws-amplify/core"
 
 
-const state = reactive({ text: "", id: null})
+const state = reactive({ 
+  text: "",
+  id: null,
+  awsWebSocket: null
+})
 const localWebSocketId =  makeid(5)  // random id for my websocket connection
 
 // Creates random ID for websocket
@@ -30,10 +34,11 @@ async function wsconnect () {
   let lastClipboard = store.aws.clipboard // store last clipboard content before change
   let lockClipboard = false // To prevent message sending while receiving message
   let wsSenderInterval = null // my loop interval for checking changes and push it via Websocket if there's a change
-  let awsWebSocket = new WebSocket(url)
+  state.awsWebSocket = new WebSocket(url)
+  const awsWebSocket = state.awsWebSocket
   
   awsWebSocket.addEventListener("open", (event) => { // event is an option here
-    // console.log("WebSocket is open now:", localWebSocketId);
+    console.log("WebSocket is open for:",localWebSocketId);
     // setStatusMessage("WebSocket open")
     wsSenderInterval = setInterval(()=>{
       if ( lastClipboard != store.aws.clipboard && !lockClipboard) {
@@ -48,8 +53,9 @@ async function wsconnect () {
 
   awsWebSocket.addEventListener("close", () => {
     // setStatusMessage("WebSocket closed")
-    console.log("WebSocket is closed now:",localWebSocketId);
+    console.log("WebSocket is closed for:",localWebSocketId);
     clearInterval(wsSenderInterval)
+    state.awsWebSocket = null;
   });
 
   awsWebSocket.addEventListener("error", (event) => {
@@ -71,6 +77,12 @@ async function wsconnect () {
 
 }
 
+async function wsdisconnect () {
+  if (state.awsWebSocket){
+    state.awsWebSocket.close()
+  }
+}
+
 onBeforeMount(()=>{
   state.id = crypto.randomUUID()
 })
@@ -88,6 +100,12 @@ onMounted( async () => {
   wsconnect()
 })
 
+onUnmounted( async () => {
+  wsdisconnect()
+  console.log(`UnMounted: AWSClipboard`)
+})
+
+
 </script>
 
 <template>
@@ -97,7 +115,7 @@ onMounted( async () => {
       name="clipboardTextarea" 
       id="clipboardTextarea" 
       cols="30" rows="10" 
-      placeholder="Share securely here with others..."
+      placeholder="Share real-time here with other authenticated browsers..."
       v-model="store.aws.clipboard">
     </textarea>
   </div>

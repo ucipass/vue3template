@@ -2,9 +2,10 @@
 import WindowInput from "./WindowInput.vue";
 import {  reactive, onMounted, onBeforeMount, watch } from 'vue'
 import { store } from '../store.js'
-import { S3, S3Client, ListObjectsCommand } from "@aws-sdk/client-s3";
+import { S3, S3Client, ListObjectsCommand, GetObjectCommand, DeleteObjectCommand} from "@aws-sdk/client-s3";
 import { Upload as UploadMulti } from "@aws-sdk/lib-storage";
 import { add , format } from 'date-fns'
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 let state = reactive({ 
   text: "", 
@@ -13,6 +14,21 @@ let state = reactive({
   uploadPercent: 1,
   uploadOngoing: false,
 })
+
+
+async function signedUrl(key){
+  let credentials = store.aws.credentials
+  let region      = store.inputs.awsSettings.region.value
+  let bucket      = store.inputs.awsSettings.s3BucketName.value  
+  const s3Client = new S3Client({
+    region: region,
+    credentials: credentials
+  });
+  const command = new GetObjectCommand({ Bucket:  bucket, Key: key});
+  const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+  console.log(url)
+  return url
+}
 
 async function listObjects(){
   let credentials = store.aws.credentials
@@ -91,11 +107,32 @@ async function upload(file){
   }
 }
 
+async function deleteKey (key) {
+  let credentials = store.aws.credentials
+  let region      = store.inputs.awsSettings.region.value
+  let bucket      = store.inputs.awsSettings.s3BucketName.value
+   
+  const s3Client = new S3Client({
+    region: region,
+    credentials: credentials
+  });
+
+  let params = { Bucket:  bucket, Key: key}
+  try {
+    await s3Client.send(new DeleteObjectCommand(params));
+    await listObjects()
+  }catch (err) {
+    console.log(err)
+    await listObjects()
+  }
+}
+
 function uploadStop(file){
   state.uploadOngoing = false
   console.log(file)
 }
 
+// Watch if a file is selected then start upload & refresh
 watch( 
   () => store.inputs.awsUpload.file.value, 
   file => {
@@ -157,10 +194,10 @@ onMounted( async () => {
           <td class="d-none d-sm-table-cell">{{file.expireDate}}</td>
           <td>
             <div class="btn-group">
-              <button type="button" class="btn btn-small btn-outline-secondary" @click="deleteFile(file.Key)" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete">
+              <button type="button" class="btn btn-small btn-outline-secondary" @click="deleteKey(file.Key)" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete">
                 <i class="bi-trash-fill" ></i>
               </button>
-              <button type="button" class="btn btn-small btn-outline-secondary" @click="signedURL(file.Key)" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Pre-signed URL to clipboard">
+              <button type="button" class="btn btn-small btn-outline-secondary" @click="signedUrl(file.Key)" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Pre-signed URL to clipboard">
                 <i class="bi-pen-fill" ></i>
               </button>
             </div>
