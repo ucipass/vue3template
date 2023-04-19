@@ -1,16 +1,25 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import { Modal } from 'bootstrap'
+import { Modal, Toast } from 'bootstrap'
 import ButtonIcon from "./ButtonIcon.vue";
 import { store } from '../store.js'
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
+
+function message(msg){
+  store.toastMessage = msg
+  var bsAlert = new Toast( document.getElementById('liveToast') );//inizialize it      
+  bsAlert.show();//show it   
+}
+
 function copy(){
   navigator.clipboard.writeText(store.aws.clipboard)
+  message("content was copied to OS clipboard!")
 }
 
 function trash(){
   store.aws.clipboard = ""
+  message("content was deleted!")
 }
 
 function save(){
@@ -37,9 +46,11 @@ function save(){
   s3Client.send(command).then(
     (data) => {
       console.log("File uploaded successfully:", data.Location);
+      message("clipboard.txt was saved successfully")
     },
     (err) => {
       console.log("Error uploading file:", err);
+      message(err.message)
     }
   );
 

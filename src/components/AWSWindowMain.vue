@@ -41,21 +41,26 @@ onMounted( async () => {
  
 
 <template>
-  <div v-if="store.aws.credentials" class="d-flex flex-column flex-fill">
+  <div v-if="store.aws.credentials" class="containers">
     <div class="mt-2 ms-1">
       <ul class="nav nav-tabs">
         <li class="nav-item">
-        <button id="navFiles"  class="nav-link active" aria-current="page" @click="activateFiles" >Files</button>
+          <button id="navFiles"  class="nav-link active" aria-current="page" @click="activateFiles" >
+            Files
+          </button>
         </li>
         <li class="nav-item">
-        <button id="navClipboard" class="nav-link" aria-current="page" @click="activateClipboard" >
-          Clipboard
-          <div v-if="store.awsWebSocketConnected" class="spinner-grow spinner-grow-sm" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </button>
+          <button id="navClipboard" class="nav-link" aria-current="page" @click="activateClipboard" >
+            Clipboard
+            <div v-if="store.awsWebSocketConnected" class="spinner-grow spinner-grow-sm" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </button>
         </li>
-      </ul>       
+        <li class="nav-item ms-auto">
+          <button class="btn btn-primary">Click me!</button>
+        </li>        
+      </ul>   
     </div>
 
     <WindowAWSFiles v-if="store.aws.navView=='files'"/>

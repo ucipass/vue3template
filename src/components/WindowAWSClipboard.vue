@@ -2,7 +2,7 @@
 import {  reactive, onMounted, onBeforeMount, onUnmounted } from 'vue'
 import { store } from '../store.js'
 import { Signer } from "@aws-amplify/core"
-
+import { Toast } from "bootstrap" ;
 
 const state = reactive({ 
   text: "",
@@ -18,6 +18,12 @@ function makeid (length) {
   var charactersLength = characters.length;
   for ( var i = 0; i < length; i++ ) result += characters.charAt(Math.floor(Math.random() * charactersLength));
   return result;
+}
+
+function message(msg){
+  store.toastMessage = msg
+  var bsAlert = new Toast( document.getElementById('liveToast') );//inizialize it      
+  bsAlert.show();//show it   
 }
 
 async function wsconnect () {
@@ -38,6 +44,7 @@ async function wsconnect () {
   const awsWebSocket = state.awsWebSocket
   
   awsWebSocket.addEventListener("open", (event) => { // event is an option here
+    message("WebSocket connected")
     console.log("WebSocket is open for:",localWebSocketId);
     store.awsWebSocketConnected = true
     wsSenderInterval = setInterval(()=>{
@@ -52,7 +59,7 @@ async function wsconnect () {
   });
 
   awsWebSocket.addEventListener("close", () => {
-    // setStatusMessage("WebSocket closed")
+    message("WebSocket closed")
     console.log("WebSocket is closed for:",localWebSocketId);
     clearInterval(wsSenderInterval)
     state.awsWebSocket = null;
@@ -60,7 +67,7 @@ async function wsconnect () {
   });
 
   awsWebSocket.addEventListener("error", (event) => {
-    setStatusMessage("WebSocket error")
+    message("WebSocket error")
     console.log("WebSocket error:",event);
     clearInterval(wsSenderInterval)
   });
