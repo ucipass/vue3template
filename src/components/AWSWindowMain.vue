@@ -41,7 +41,7 @@ onMounted( async () => {
  
 
 <template>
-  <div v-if="store.aws.credentials" class="containers">
+  <div v-if="store.aws.credentials" class="d-flex flex-column flex-fill">
     <div class="mt-2 ms-1">
       <ul class="nav nav-tabs">
         <li class="nav-item">
@@ -58,8 +58,16 @@ onMounted( async () => {
           </button>
         </li>
         <li class="nav-item ms-auto">
-          <button class="btn btn-primary">Click me!</button>
-        </li>        
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary">
+              <i class="bi bi-1-circle"></i>
+            </button>
+            <button class="btn btn-outline-secondary">
+              <i class="bi bi-2-circle"></i>
+            </button>
+          </div>
+          
+        </li>              
       </ul>   
     </div>
 
