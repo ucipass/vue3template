@@ -39,7 +39,7 @@ async function wsconnect () {
   
   awsWebSocket.addEventListener("open", (event) => { // event is an option here
     console.log("WebSocket is open for:",localWebSocketId);
-    // setStatusMessage("WebSocket open")
+    store.awsWebSocketConnected = true
     wsSenderInterval = setInterval(()=>{
       if ( lastClipboard != store.aws.clipboard && !lockClipboard) {
         lastClipboard = store.aws.clipboard
@@ -56,6 +56,7 @@ async function wsconnect () {
     console.log("WebSocket is closed for:",localWebSocketId);
     clearInterval(wsSenderInterval)
     state.awsWebSocket = null;
+    store.awsWebSocketConnected = false
   });
 
   awsWebSocket.addEventListener("error", (event) => {

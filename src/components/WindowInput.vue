@@ -31,6 +31,7 @@
               class="form-control" 
               :style="input.style"
               :placeholder="input.placeholder"
+              :readonly="input.readonly"
               v-model="inputs[input.id].value" 
             ></textarea>        
 
@@ -59,7 +60,9 @@
             <input v-else
               class="form-control" 
               :type="input.type"
-              :placeholder="input.placeholder" 
+              :placeholder="input.placeholder"
+              :readonly="input.readonly"
+              is-valid
               v-model="inputs[input.id].value" 
               @click="inputClick"
               @keyup.enter="$emit('submit', inputs)"
@@ -142,6 +145,7 @@ const computed_inputs = computed(() => {
         label       : inputs_object[id].label ? inputs_object[id].label : id,
         type        : inputs_object[id].type  ? inputs_object[id].type :  "text",
         placeholder : inputs_object[id].placeholder ? inputs_object[id].placeholder : "",
+        readonly    : inputs_object[id].readonly ? true : false,
         information : inputs_object[id].information ? inputs_object[id].information : id,
         options     : inputs_object[id].options ? inputs_object[id].options : [],
         style       : inputs_object[id].type == "textarea" ?  "resize: none;height: 100px" : null

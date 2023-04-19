@@ -1,4 +1,5 @@
 <script setup >
+import AWSButtonGroup from "./AWSButtonGroup.vue";
 import { onMounted } from "vue";
 import { store } from "../store.js"
 import ButtonIcon from "./ButtonIcon.vue";
@@ -42,25 +43,31 @@ onMounted(() => {
 
 <template>
   <nav id="Navbar" class="ps-1 pe-1 navbar sticky-top navbar-expand navbar-dark bg-dark justify-content-between">
-    <div class="form-floating ms-0">
+  <!-- <div class="form-floating ms-0">
       <input readonly type="text" class="form-control bg-dark text-white" id="floatingStatus" placeholder="Status" value="Not logged in">
       <label class="text-white" for="floatingStatus">Current Status</label>
-  </div>       
-      <div class="btn-group">
+  </div>        -->
+
+
+      <!-- <div class="btn-group">
         <ButtonIcon icon="list-task"  text="Sources" @click="rooms"/>
         <ButtonIcon icon="trash"      text="Clear" @click="trash"/>
         <ButtonIcon v-if="false" icon="house-door" text="Home"/>
         <ButtonIcon v-if="false" icon="clipboard"  text="Copy"/>
-      </div>        
-      <div class="btn-group">
+      </div>     -->
+
+    <div class="btn-group">
+
+
 <!-- 
         <ButtonIcon v-if="!store.loggedIn" @click="login " icon="box-arrow-in-right" text="Login"/>
         <ButtonIcon v-if=" store.loggedIn" @click="logout" icon="box-arrow-right"    text="Logout"/>
  -->
- <ButtonIcon icon="cloud" text="AWS Settings" @click="aws_settings"/>
- <ButtonIcon icon="lightning" text="Socket.io Settings" @click="socketio"/>
- <ButtonIcon icon="gear" text="Settings"/>
-      </div>         
+      
+ <!-- <ButtonIcon icon="lightning" text="Socket.io Settings" @click="socketio"/> -->
+ <!-- <ButtonIcon icon="gear" text="Settings"/> -->
+    </div>   
+    <AWSButtonGroup v-if="store.aws.credentials"/>      
   </nav>
 </template>
 

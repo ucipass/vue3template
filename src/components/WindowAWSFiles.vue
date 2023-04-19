@@ -53,6 +53,24 @@ async function listObjects(){
     }  
 }
 
+async function download (key){
+    try {
+      let url = await signedUrl(key)
+      let filename = key.split("/").pop()
+      console.log("Download",filename)
+      const link = document.createElement('a');
+      link.href = url;
+      link.download  = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } 
+    catch (error) {
+      console.log("Error",error)
+    }
+  }
+
+
 function readFileToConsole(file){
   const reader = new FileReader();
   reader.onload = (evt) => {

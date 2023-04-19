@@ -1,14 +1,16 @@
 import { reactive } from 'vue'
 
-
 export const store = reactive({
   aws:{
     credentials: null,
     idToken: null,
     status: "Disconnected",
-    clipboard: ""
+    clipboard: "",
+    awsWebSocketConnected: false,
+    navView: "files" //Controls which view is shown on navbar
   },
   socket: null,
+  toastMessage: "",
   textarea: "",
   loggedIn: false,
   series: null,
@@ -18,13 +20,14 @@ export const store = reactive({
     height: 100
   },
   inputs:{
-    login:{
+    awsLogin:{
       username: { 
         label: "Username", 
         type: "text",
-        placeholder: "Enter username1 here...",
-        information: "Enter username1 here...",
-        value: ""
+        placeholder: "Enter your username...",
+        information: "This is your AWS Cognito username",
+        readonly: true,
+        value: "admin"
       },
       password: { 
         label: "Password", 
@@ -33,7 +36,73 @@ export const store = reactive({
         information: "Enter password here...",
         value: ""
       },
-      auth: { 
+    },
+    awsConfig:{
+      s3BucketName: { 
+        label: "AWS S3 Bucket Name", 
+        type: "text",
+        placeholder: "Enter AWS S3 Bucket Name here...",
+        information: "Enter AWS S3 Bucket Name here...",
+        value: "copyrun"
+      },
+      region: { 
+        label: "AWS Region", 
+        type: "select",
+        placeholder: "Pick your AWS region",
+        information: "AWS Region Identifier. Pick us-east-1 for easy S3 bucket naming.",
+        value: "us-east-1",
+        options:[
+          {text:"us-east-1", value: "us-east-1"},
+          {text:"us-east-2", value: "us-east-2"},
+          {text:"us-west-1", value: "us-west-1"},
+          {text:"us-west-2", value: "us-west-2"},
+        ],
+      },
+      userPoolId: { 
+        label: "AWS User Pool Id", 
+        type: "text",
+        placeholder: "Enter AWS User Pool Id here...",
+        information: "Enter AWS User Pool Id here...",
+        value: "us-east-1_WvkalowgA"
+      },
+      clientId: { 
+        label: "AWS User Pool Client Id", 
+        type: "text",
+        placeholder: "Enter AWS Client Id here...",
+        information: "Enter AWS Client Id here...",
+        value: "7i36jg8gdgooafqhf46up4v704"
+      },
+      identityPoolId: { 
+        label: "AWS Identity Pool Id", 
+        type: "text",
+        placeholder: "Enter AWS Identity Pool Id here...",
+        information: "Enter AWS Identity Pool Id here...",
+        value: "us-east-1:94c5e4cf-d7bf-4d9c-916b-c8099e9150fe"
+      },    
+      websocket_api: { 
+        label: "Websocket API", 
+        type: "text",
+        placeholder: "Enter AWS User Pool Id here...",
+        information: "(e.g.) wss://a36mhyc4r7.execute-api.us-east-1.amazonaws.com/prod",
+        value: "wss://a36mhyc4r7.execute-api.us-east-1.amazonaws.com/prod"
+      },
+    },
+    login:{
+        username: { 
+          label: "Username", 
+          type: "text",
+          placeholder: "Enter username1 here...",
+          information: "Enter username1 here...",
+          value: ""
+        },
+        password: { 
+          label: "Password", 
+          type: "password",
+          placeholder: "Enter password here...",
+          information: "Enter password here...",
+          value: ""
+        },
+        auth: { 
         label: "Authentication Type", 
         type: "select",
         placeholder: "Pick your authentication type",
