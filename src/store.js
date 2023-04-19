@@ -38,12 +38,12 @@ export const store = reactive({
       },
     },
     awsConfig:{
-      s3BucketName: { 
+      bucket: { 
         label: "AWS S3 Bucket Name", 
         type: "text",
         placeholder: "Enter AWS S3 Bucket Name here...",
         information: "Enter AWS S3 Bucket Name here...",
-        value: "copyrun"
+        value: ""
       },
       region: { 
         label: "AWS Region", 
@@ -63,28 +63,28 @@ export const store = reactive({
         type: "text",
         placeholder: "Enter AWS User Pool Id here...",
         information: "Enter AWS User Pool Id here...",
-        value: "us-east-1_WvkalowgA"
+        value: "" //e.g us-east-1_WvkalowgA
       },
       clientId: { 
         label: "AWS User Pool Client Id", 
         type: "text",
         placeholder: "Enter AWS Client Id here...",
         information: "Enter AWS Client Id here...",
-        value: "7i36jg8gdgooafqhf46up4v704"
+        value: "" // e.g 7i36jg8gdgooafqhf46up4v704
       },
       identityPoolId: { 
         label: "AWS Identity Pool Id", 
         type: "text",
         placeholder: "Enter AWS Identity Pool Id here...",
         information: "Enter AWS Identity Pool Id here...",
-        value: "us-east-1:94c5e4cf-d7bf-4d9c-916b-c8099e9150fe"
+        value: "" // e.g us-east-1:94c5e4cf-d7bf-4d9c-916b-c8099e9150fe
       },    
       websocket_api: { 
         label: "Websocket API", 
         type: "text",
         placeholder: "Enter AWS User Pool Id here...",
         information: "(e.g.) wss://a36mhyc4r7.execute-api.us-east-1.amazonaws.com/prod",
-        value: "wss://a36mhyc4r7.execute-api.us-east-1.amazonaws.com/prod"
+        value: "" // e.g wss://a36mhyc4r7.execute-api.us-east-1.amazonaws.com/prod
       },
     },
     login:{

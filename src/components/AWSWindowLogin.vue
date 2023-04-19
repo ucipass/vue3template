@@ -9,7 +9,6 @@ import {	AuthenticationDetails, CognitoUserPool, CognitoUser } from 'amazon-cogn
 import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts"
 import { getUnixTime } from 'date-fns'
 import { Toast, Modal } from "bootstrap" ;
-import WindowAWSClipboard from "./WindowAWSClipboard.vue";
 import ButtonIcon from "./ButtonIcon.vue";
 
 function message(msg){
@@ -18,8 +17,8 @@ function message(msg){
   bsAlert.show();//show it   
 }
 
-function aws_settings(){
-  let elem = document.getElementById("modalAWSSettings")
+function aws_config(){
+  let elem = document.getElementById("modalAWSConfig")
   let modal = new Modal(elem)
   modal.show()    
 }
@@ -121,16 +120,39 @@ async function login(){
 
 
 onMounted( async () => {
-  const configUrl = 'https://copyrun.s3.us-east-1.amazonaws.com/awsconfig.jssn'
-  const res = await fetch(configUrl);
-  if (res.ok) {
-    const data = await res.json().catch(()=> null);
-    console.log(data);
-  }
+  if ( localStorage.getItem("awsConfig") )
+    try {
+      const awsConfig = JSON.parse(localStorage.getItem("awsConfig"))
+      store.inputs.awsConfig.bucket.value = awsConfig.bucket
+      store.inputs.awsConfig.region.value = awsConfig.region
+      store.inputs.awsConfig.userPoolId.value = awsConfig.userPoolId
+      store.inputs.awsConfig.clientId.value = awsConfig.clientId
+      store.inputs.awsConfig.identityPoolId.value = awsConfig.identityPoolId
+      store.inputs.awsConfig.websocket_api.value = awsConfig.websocket_api
+    } catch (error) {
+      message("Invalid local configuration! Reverting to default config...")
+      localStorage.removeItem("awsConfig")
+      return;
+    }
   else{
-    message(`${res.statusText} - ${configUrl}`)
+    const url = new URL(window.location.href);
+    const configUrl = `${url.origin}/awsconfig.json`
+    const res = await fetch(configUrl);
+    if (res.ok) {
+      const awsConfig = await res.json().catch(()=> null);
+      store.inputs.awsConfig.bucket.value = awsConfig.bucket
+      store.inputs.awsConfig.region.value = awsConfig.region
+      store.inputs.awsConfig.userPoolId.value = awsConfig.userPoolId
+      store.inputs.awsConfig.clientId.value = awsConfig.clientId
+      store.inputs.awsConfig.identityPoolId.value = awsConfig.identityPoolId
+      store.inputs.awsConfig.websocket_api.value = awsConfig.websocket_api
+    }
+    else{
+      message(`${res.statusText} - ${configUrl}`)
+      return;
+    }
   }
-  const url = new URL(window.location.href);
+  const url = new URL(window.location.href)
   const idToken = url.searchParams.get("idToken")
   if( idToken ) {
     localStorage.setItem("idToken",idToken)
@@ -149,7 +171,7 @@ onMounted( async () => {
         <div class="card">
           <div class="card-header">
             Login
-            <span class="float-end" @click="aws_settings">
+            <span class="float-end" @click="aws_config">
               <i class="bi bi-gear"></i>
             </span>
             

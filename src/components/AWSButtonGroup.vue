@@ -62,7 +62,7 @@ function save(){
 
 }
 
-function aws_settings(){
+function aws_share(){
   let elem = document.getElementById("modalAWSSettings")
   let modal = new Modal(elem)
   modal.show()    
@@ -81,7 +81,6 @@ onMounted(() => {
     <ButtonIcon v-if="store.aws.navView=='clipboard'" color="dark" icon="clipboard"  text="Copy" @click="copy"/>
     <ButtonIcon v-if="store.aws.navView=='clipboard'" color="dark" icon="trash"      text="Delete" @click="trash"/>
     <ButtonIcon v-if="store.aws.credentials" color="dark" icon="box-arrow-right" text="Logout" @click="logout"/>
-    <ButtonIcon color="dark" icon="gear" text="AWS Settings" @click="aws_settings"/>
   </div>     
 </template>
 

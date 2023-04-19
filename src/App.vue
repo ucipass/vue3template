@@ -2,7 +2,7 @@
 import NavBar     from "./components/NavBar.vue";
 import ModalRooms from "./components/ModalRooms.vue";
 import ModalSocketIO from "./components/ModalSocketIO.vue";
-import AWSModalSettings from "./components/AWSModalSettings.vue";
+import AWSModalConfig from "./components/AWSModalConfig.vue";
 import AWSWindowMain from "./components/AWSWindowMain.vue";
 import ToastMessage from './components/ToastMessage.vue';
 
@@ -15,13 +15,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <NavBar/>
+  <!-- <NavBar/> -->
   <div class="m-0 p-0 d-flex flex-column h-100 border-0 overflow-auto">
     <AWSWindowMain/>
   </div>       
   <!-- <ModalRooms/> -->
   <!-- <ModalSocketIO/> -->
-  <AWSModalSettings/>
+  <AWSModalConfig/>
   <ToastMessage/>
 </template>
 

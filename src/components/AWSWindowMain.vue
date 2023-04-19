@@ -1,13 +1,10 @@
 <script setup>
-import WindowAWSClipboard from "./WindowAWSClipboard.vue";
-import WindowAWSFiles from "./WindowAWSFiles.vue";
+import AWSWindowClipboard from "./AWSWindowClipboard.vue";
+import AWSWindowFiles from "./AWSWindowFiles.vue";
 import AWSWindowLogin from "./AWSWindowLogin.vue";
-import ButtonIcon from "./ButtonIcon.vue";
 import AWSButtonGroup from "./AWSButtonGroup.vue";
 import {  reactive, onMounted, onBeforeMount } from 'vue'
 import { store } from '../store.js'
-import { Signer } from "@aws-amplify/core"
-
 
 let state = reactive(
   { 
@@ -17,14 +14,9 @@ let state = reactive(
 )
 
 function activateFiles(){       
-    document.getElementById("navClipboard").classList.remove('active');
-    document.getElementById("navFiles").classList.add('active');
     store.aws.navView="files";  
 }
 function activateClipboard(){    
-    document.getElementById("navClipboard").classList.add('active');
-    state.clipboard=true; 
-    document.getElementById("navFiles").classList.remove('active');
     store.aws.navView="clipboard";   
 }
 
@@ -36,7 +28,6 @@ onMounted( async () => {
   console.log(`Mounted: AWSMain`)
 })
 
-
 </script>
  
 
@@ -45,12 +36,12 @@ onMounted( async () => {
     <div class="mt-2 ms-1 me-1">
       <ul class="nav nav-tabs">
         <li  class="nav-item">
-          <button id="navFiles"  class="nav-link active" aria-current="page" @click="activateFiles" >
+          <button id="navFiles"  class="nav-link" :class="store.aws.navView=='files' ? 'active' : ''" aria-current="page" @click="activateFiles" >
             Files
           </button>
         </li>
         <li class="nav-item">
-          <button id="navClipboard" class="nav-link" aria-current="page" @click="activateClipboard" >
+          <button id="navClipboard" class="nav-link" :class="store.aws.navView=='clipboard' ? 'active' : ''" aria-current="page" @click="activateClipboard" >
             Clipboard
             <div v-if="store.awsWebSocketConnected" class="spinner-grow spinner-grow-sm" role="status">
               <span class="visually-hidden">Loading...</span>
@@ -63,8 +54,8 @@ onMounted( async () => {
       </ul>   
     </div>
     <div class="d-flex flex-column flex-fill">
-      <WindowAWSFiles v-if="store.aws.navView=='files'"/>
-      <WindowAWSClipboard class="m-1" v-if="store.aws.navView=='clipboard'" id="awsupload"/>   
+      <AWSWindowFiles v-if="store.aws.navView=='files'"/>
+      <AWSWindowClipboard class="m-1" v-if="store.aws.navView=='clipboard'" id="awsupload"/>   
     </div>
 
   </div>
