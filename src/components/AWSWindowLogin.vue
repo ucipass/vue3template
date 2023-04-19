@@ -8,7 +8,9 @@ import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-id
 import {	AuthenticationDetails, CognitoUserPool, CognitoUser } from 'amazon-cognito-identity-js';
 import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts"
 import { getUnixTime } from 'date-fns'
-import { Toast } from "bootstrap" ;
+import { Toast, Modal } from "bootstrap" ;
+import WindowAWSClipboard from "./WindowAWSClipboard.vue";
+import ButtonIcon from "./ButtonIcon.vue";
 
 function message(msg){
   store.toastMessage = msg
@@ -16,6 +18,11 @@ function message(msg){
   bsAlert.show();//show it   
 }
 
+function aws_settings(){
+  let elem = document.getElementById("modalAWSSettings")
+  let modal = new Modal(elem)
+  modal.show()    
+}
 
 async function getIdToken () {
   const username        = store.inputs.awsLogin.username.value
@@ -62,33 +69,33 @@ async function getIdToken () {
   return t;
 }
 
+
 async function getCredentials () {  
   const region          = store.inputs.awsConfig.region.value
   const userPoolId      = store.inputs.awsConfig.userPoolId.value
   const identityPoolId  = store.inputs.awsConfig.identityPoolId.value
 
-  const currentTime = getUnixTime(Date.now()) 
   const idToken = localStorage.getItem("idToken")
-  const idToken_expiration = parseInt( localStorage.getItem("idToken_expiration") )
-
-  if ( idToken && idToken_expiration > currentTime ) {
-    store.aws.idToken = idToken
-    store.inputs.awsSettings.idToken.value = idToken
-    const credentials = fromCognitoIdentityPool({
+  if ( !idToken ) return;
+  const credentials = fromCognitoIdentityPool({
         client: new CognitoIdentityClient({region:region}),
         identityPoolId: identityPoolId,
         logins: { [`cognito-idp.${region}.amazonaws.com/${userPoolId}`] : idToken },
-    })
-   
-    const config = {
+  })
+  const config = {
       region: region,
       credentials: credentials
     }   
     
-    const client = new STSClient(config);
-    const input = {};
-    const command = new GetCallerIdentityCommand(input);
-    const response = await client.send(command);
+  const client = new STSClient(config);
+  const input = {};
+  const command = new GetCallerIdentityCommand(input);
+  const response = await client.send(command).catch(()=> null);;   
+
+
+  if ( response ) {
+    store.aws.idToken = idToken
+    store.inputs.awsSettings.idToken.value = idToken
     store.inputs.awsSettings.account.value = response.Account
     store.inputs.awsSettings.userid.value = response.UserId
     store.inputs.awsSettings.arn.value = response.Arn
@@ -113,9 +120,26 @@ async function login(){
 }
 
 
-onMounted(() => {
-  console.log("Mounted: AWS Login")
-
+onMounted( async () => {
+  const configUrl = 'https://copyrun.s3.us-east-1.amazonaws.com/awsconfig.jssn'
+  const res = await fetch(configUrl);
+  if (res.ok) {
+    const data = await res.json().catch(()=> null);
+    console.log(data);
+  }
+  else{
+    message(`${res.statusText} - ${configUrl}`)
+  }
+  const url = new URL(window.location.href);
+  const idToken = url.searchParams.get("idToken")
+  if( idToken ) {
+    localStorage.setItem("idToken",idToken)
+    url.searchParams.delete("idToken")
+    window.location.href=url.href
+  }else{
+    getCredentials()
+  }
+  
 });
 </script>
 
@@ -125,6 +149,10 @@ onMounted(() => {
         <div class="card">
           <div class="card-header">
             Login
+            <span class="float-end" @click="aws_settings">
+              <i class="bi bi-gear"></i>
+            </span>
+            
           </div>
           <div class="card-body">
             <WindowInput id="awsLogin" @submit="login"/>

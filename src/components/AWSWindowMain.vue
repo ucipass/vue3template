@@ -26,7 +26,6 @@ function activateClipboard(){
     state.clipboard=true; 
     document.getElementById("navFiles").classList.remove('active');
     store.aws.navView="clipboard";   
-
 }
 
 onBeforeMount(()=>{
@@ -42,15 +41,15 @@ onMounted( async () => {
  
 
 <template>
-  <div  class="d-flex flex-column flex-fill">
+  <div v-if="store.aws.credentials" class="d-flex flex-column flex-fill">
     <div class="mt-2 ms-1 me-1">
       <ul class="nav nav-tabs">
-        <li v-if="store.aws.credentials" class="nav-item">
+        <li  class="nav-item">
           <button id="navFiles"  class="nav-link active" aria-current="page" @click="activateFiles" >
             Files
           </button>
         </li>
-        <li v-if="store.aws.credentials" class="nav-item">
+        <li class="nav-item">
           <button id="navClipboard" class="nav-link" aria-current="page" @click="activateClipboard" >
             Clipboard
             <div v-if="store.awsWebSocketConnected" class="spinner-grow spinner-grow-sm" role="status">
@@ -63,13 +62,13 @@ onMounted( async () => {
         </li>              
       </ul>   
     </div>
-    <div  v-if="store.aws.credentials"  class="d-flex flex-column flex-fill">
+    <div class="d-flex flex-column flex-fill">
       <WindowAWSFiles v-if="store.aws.navView=='files'"/>
       <WindowAWSClipboard class="m-1" v-if="store.aws.navView=='clipboard'" id="awsupload"/>   
     </div>
 
   </div>
-  <div v-if="!store.aws.credentials" class="d-flex flex-column flex-fill justify-content-center align-items-center">
+  <div v-else class="d-flex flex-column flex-fill justify-content-center align-items-center">
     <AWSWindowLogin/>
   </div>
 

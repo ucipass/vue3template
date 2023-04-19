@@ -81,7 +81,7 @@ onMounted(() => {
     <ButtonIcon v-if="store.aws.navView=='clipboard'" color="dark" icon="clipboard"  text="Copy" @click="copy"/>
     <ButtonIcon v-if="store.aws.navView=='clipboard'" color="dark" icon="trash"      text="Delete" @click="trash"/>
     <ButtonIcon v-if="store.aws.credentials" color="dark" icon="box-arrow-right" text="Logout" @click="logout"/>
-    <ButtonIcon color="dark" icon="cloud" text="AWS Settings" @click="aws_settings"/>
+    <ButtonIcon color="dark" icon="gear" text="AWS Settings" @click="aws_settings"/>
   </div>     
 </template>
 

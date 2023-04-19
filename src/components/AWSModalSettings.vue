@@ -121,8 +121,6 @@ const connected = computed(() => store.aws && store.aws.credentials ? true : fal
 
 onMounted(() => {
     console.log(`Mounted: ModalAWSettings`)
-    getCredentials()
-
 });
 
 </script>
