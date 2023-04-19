@@ -22,6 +22,12 @@ function trash(){
   message("content was deleted!")
 }
 
+async function logout(){
+  localStorage.removeItem("idToken");
+  localStorage.removeItem("idToken_expiration");
+  store.aws.credentials = null
+}
+
 function save(){
   const region = store.inputs.awsSettings.region.value
   const bucket = store.inputs.awsSettings.s3BucketName.value
@@ -71,10 +77,11 @@ onMounted(() => {
 
 <template> 
   <div class="btn-group">
-    <ButtonIcon icon="save2"      text="Save" @click="save"/>
-    <ButtonIcon icon="clipboard"  text="Copy" @click="copy"/>
-    <ButtonIcon icon="trash"      text="Delete" @click="trash"/>
-    <ButtonIcon icon="cloud" text="AWS Settings" @click="aws_settings"/>
+    <ButtonIcon v-if="store.aws.navView=='clipboard'" color="dark" icon="save2"      text="Save" @click="save"/>
+    <ButtonIcon v-if="store.aws.navView=='clipboard'" color="dark" icon="clipboard"  text="Copy" @click="copy"/>
+    <ButtonIcon v-if="store.aws.navView=='clipboard'" color="dark" icon="trash"      text="Delete" @click="trash"/>
+    <ButtonIcon v-if="store.aws.credentials" color="dark" icon="box-arrow-right" text="Logout" @click="logout"/>
+    <ButtonIcon color="dark" icon="cloud" text="AWS Settings" @click="aws_settings"/>
   </div>     
 </template>
 

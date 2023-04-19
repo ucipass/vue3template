@@ -128,7 +128,7 @@ onMounted(() => {
           </div>
           <div class="card-body">
             <WindowInput id="awsLogin" @submit="login"/>
-            <button type="submit" class="btn btn-primary" @click="login" >Submit</button>
+            <button type="submit" class="btn btn-primary float-end" @click="login" >Submit</button>
           </div>
         </div>      
     </div>

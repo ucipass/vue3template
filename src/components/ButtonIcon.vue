@@ -14,11 +14,16 @@ const props = defineProps({
   placement: {
     type: String,
     default: "bottom"
-  }
+  },
+  color: {
+    type: String,
+    default: "light"
+  },
 })
 
 const iconClass = computed(() => {
-  return "bi text-light bi-" + props.icon
+  // return `bi bi-${props.icon}`
+  return `bi text-${props.color} bi-${props.icon}`
 })
 
 const buttonIconInstance = ref(null);
