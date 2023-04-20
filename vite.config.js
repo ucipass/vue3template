@@ -1,22 +1,25 @@
 import { fileURLToPath, URL } from "node:url";
-
+import  process from 'process';
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import { nodePolyfills } from 'vite-plugin-node-polyfills'
+import nodePolyfills from 'rollup-plugin-node-polyfills';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    vue(),
-    nodePolyfills({
-      // Whether to polyfill `node:` protocol imports.
-      protocolImports: true,
-    }),    
+    vue(), 
   ],
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
-      "./runtimeConfig": "./runtimeConfig.browser", //fix production build
+
+      ...(process.env.NODE_ENV !== 'development'
+      ? {
+        './runtimeConfig': './runtimeConfig.browser', //fix production build
+        stream : 'rollup-plugin-node-polyfills/polyfills/stream',
+      }
+      : {
+        "@": fileURLToPath(new URL("./src", import.meta.url)),
+      }),
     },
   },
   define: {
@@ -24,4 +27,5 @@ export default defineConfig({
     // necessary for segment analytics lib to work
     global: {},
   },
+
 });
